@@ -343,7 +343,7 @@ class _TierCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Nombre + label
+                // Nombre + labels
                 Row(
                   children: [
                     Expanded(
@@ -358,11 +358,12 @@ class _TierCard extends StatelessWidget {
                         ),
                       ),
                     ),
+                    // Label: MEGA, LEGENDARY, MYTHIC
                     if (entry.label.isNotEmpty)
                       Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 6, vertical: 2),
-                        margin: const EdgeInsets.only(left: 6),
+                        margin: const EdgeInsets.only(left: 4),
                         decoration: BoxDecoration(
                           color: _labelColor(entry).withOpacity(0.15),
                           borderRadius: BorderRadius.circular(5),
@@ -375,6 +376,30 @@ class _TierCard extends StatelessWidget {
                           entry.label,
                           style: TextStyle(
                             color: _labelColor(entry),
+                            fontSize: 8,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ),
+                    // Badge: NORMAL, SHADOW (si no tiene otro label)
+                    if (entry.label.isEmpty && entry.formType.isNotEmpty)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
+                        margin: const EdgeInsets.only(left: 4),
+                        decoration: BoxDecoration(
+                          color: _formColor(entry).withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(5),
+                          border: Border.all(
+                            color: _formColor(entry).withOpacity(0.5),
+                            width: 1,
+                          ),
+                        ),
+                        child: Text(
+                          entry.formType,
+                          style: TextStyle(
+                            color: _formColor(entry),
                             fontSize: 8,
                             fontWeight: FontWeight.w800,
                             letterSpacing: 0.5,
@@ -468,6 +493,11 @@ class _TierCard extends StatelessWidget {
     if (e.isMythic) return const Color(0xFFA855F7);
     if (e.isLegendary) return const Color(0xFFFFD700);
     return AppTheme.accentBlue;
+  }
+
+  Color _formColor(TierEntry e) {
+    if (e.isShadow) return const Color(0xFF7C4DFF); // Púrpura para shadow
+    return AppTheme.textSecond; // Gris neutro para normal
   }
 }
 

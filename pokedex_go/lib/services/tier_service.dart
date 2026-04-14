@@ -15,93 +15,93 @@ class TierService {
   // ─────────────────────────────────────────────────────────────────────────
   static const Map<String, List<String>> _hardcodedTop = {
     'Bug': [
-      'Pinsir', 'Heracross', 'Beedrill', 'Pheromosa', 'Pinsir',
-      'Scizor', 'Scizor', 'Volcarona', 'Scyther', 'Vikavolt',
+      'Mega Pinsir', 'Mega Heracross', 'Mega Beedrill', 'Pheromosa', 'Pinsir Shadow',
+      'Scizor Shadow', 'Mega Scizor', 'Volcarona', 'Scyther Shadow', 'Vikavolt',
     ],
     'Dark': [
-      'Yveltal', 'Darkrai', 'Darkrai', 'Yveltal', 'Yveltal',
-      'Yveltal', 'Darkrai', 'Darkrai', 'Yveltal', 'Darkrai',
+      'Mega Absol', 'Mega yranitar', 'Tyranitar Shadow', 'Absol', 'Mega Houndoom',
+      'Weavile Shadow', 'Salamence Shadow', 'Hydreigon', 'Honchkrow', 'Mega Salamence',
     ],
     'Dragon': [
-      'Rayquaza', 'Rayquaza', 'Rayquaza', 'Rayquaza', 'Rayquaza',
-      'Rayquaza', 'Rayquaza', 'Rayquaza', 'Rayquaza', 'Dragonite',
+      'Eternatus', 'Mega Rayquaza', 'Mega Garchomp', 'Garchomp Shadow', 'Palkia Shadow',
+      'Salamence Shadow', 'Dragonite Shadow', 'Mega Palkia Origen', 'Mega Salamence', 'Dialga Shadow',
     ],
     'Electric': [
-      'Zekrom', 'Zekrom', 'Zekrom', 'Zekrom', 'Zekrom',
-      'Electivire', 'Zekrom', 'Xurkitree', 'Raikou', 'Xurkitree',
+      'Regieleky', 'Raikou Shadow', 'Electivire Shadow', 'Xurkitree', 'Mega Manectric',
+      'Thundurus Totem', 'Zapdos Shadow', 'Magnezone Shadow', 'Zekrom', 'Luxray Shadow',
     ],
     'Fairy': [
-      'Xerneas', 'Togekiss', 'Xerneas', 'Gardevoir', 'Xerneas',
-      'Zacian', 'Xerneas', 'Gardevoir', 'Togekiss', 'Xerneas',
+      'Mega Gardevoir', 'Zacian', 'Gardevoir Shadow', 'Mega Alakazam', 'Enamorus',
+      'Xurkitree', 'Grandbull Shadow', 'Xerneas', 'Alakazam Shadow', 'Gardevoir',
     ],
     'Fighting': [
-      'Terrakion', 'Lucario', 'Terrakion', 'Lucario', 'Lucario',
-      'Lucario', 'Lucario', 'Terrakion', 'Terrakion', 'Machamp',
+      'Mega Lucario', 'Mega Blaziken', 'Lucario', 'Mega Heracross', 'Conkeldurr Shadow',
+      'Terrakion', 'Machamp Shadow', 'Mega Alakazam', 'Hariyama Shadow', 'Keldeo',
     ],
     'Fire': [
-      'Reshiram', 'Reshiram', 'Reshiram', 'Reshiram', 'Reshiram',
-      'Chandelure', 'Entei', 'Reshiram', 'Chandelure', 'Reshiram',
+      'Mega Blaziken', 'Mega Charizard Y', 'Heatran Shadow', 'Blaziken Shadow', 'Chandelure Shadow',
+      'Darmanitan Shadow', 'Emboar Shadow', 'Moltres Shadow', 'Reshiram', 'Charizard Shadow',
     ],
     'Flying': [
-      'Rayquaza', 'Rayquaza', 'Moltres', 'Rayquaza', 'Rayquaza',
-      'Moltres', 'Rayquaza', 'Rayquaza', 'Rayquaza', 'Staraptor',
+      'Mega Rayquaza', 'Rayquaza', 'Salamence Shadow', 'Staraptor Shadow', 'Moltres Shadow',
+      'Mega Salamence', 'Mega Pidgeot', 'Yveltal', 'Enamorus', 'Honchkrow Shadow',
     ],
     'Ghost': [
-      'Giratina', 'Chandelure', 'Giratina', 'Chandelure', 'Giratina',
-      'Giratina', 'Chandelure', 'Giratina', 'Giratina', 'Giratina',
+      'Mega Gengar', 'Necrozma (Lunala)', 'Chandelure Shadow', 'Gengar', 'Mega Bannete',
+      'Mewtwo Shadow', 'Blacephalon', 'Gengar', 'Chandelure', 'Dragapult',
     ],
     'Grass': [
-      'Kartana', 'Leafeon', 'Kartana', 'Kartana', 'Kartana',
-      'Kartana', 'Kartana', 'Leafeon', 'Kartana', 'Tangrowth',
+      'Mega Sceptile', 'Kartana', 'Shaymin (cielo)', 'Mega Venusaur', 'Venusaur Shadow',
+      'Sceptile Shadow', 'Tangrowth Shadow', 'Torterra Shadow', 'Zarude', 'Meowscarada',
     ],
     'Ground': [
-      'Groudon', 'Groudon', 'Groudon', 'Groudon', 'Groudon',
-      'Groudon', 'Garchomp', 'Groudon', 'Groudon', 'Groudon',
+      'Mega Primal Groudon', 'Mega Garchomp', 'Groudon Shadow', 'Garchomp Shadow', 'Excadrill Shadow',
+      'Landorus', 'Mamoswine Shadow', 'Rhyperior Shadow', 'Groudon', 'Golurk Shadow',
     ],
     'Ice': [
-      'Mamoswine', 'Darmanitan', 'Mamoswine', 'Weavile', 'Mamoswine',
-      'Mamoswine', 'Mamoswine', 'Glaceon', 'Darmanitan', 'Mamoswine',
+      'Kyurem Blanco', 'Kyurem Negro', 'Mamoswine Shadow', 'Weavile Shadow', 'Mewtwo Shadow',
+      'Darmanitan', 'Baxcalibur', 'Mega Glalie', 'Mega Abomasnow', 'Mamoswine',
     ],
     'Poison': [
-      'Nihilego', 'Nihilego', 'Nihilego', 'Nihilego', 'Nihilego',
-      'Nihilego', 'Nihilego', 'Nihilego', 'Beedrill', 'Nihilego',
+      'Mega Beedrill', 'Mega Gengar', 'Eternatus', 'Naganadel', 'Nihilego',
+      'Toxicroak Shadow', 'Roserade', 'Victreebel Shadow', 'Vileplume Shadow', 'Skuntank Shadow',
     ],
     'Psychic': [
-      'Mewtwo', 'Mewtwo', 'Mewtwo', 'Mewtwo', 'Mewtwo',
-      'Mewtwo', 'Mewtwo', 'Mewtwo', 'Mewtwo', 'Mewtwo',
+      'Mewtwo Shadow', 'Mega Alakazam', 'Mewtwo', 'Mega Gallade/Gardevoir', 'Mega Latios',
+      'Hoopa (Desatado)', 'Alakazam Shadow', 'Latios Shadow', 'Metagross Shadow', 'Exeggutor Shadow',
     ],
     'Rock': [
-      'Rampardos', 'Rhyperior', 'Rampardos', 'Rhyperior', 'Rampardos',
-      'Terrakion', 'Rhyperior', 'Rampardos', 'Rampardos', 'Rhyperior',
+      'Rampardos Shadow', 'Mega Diancie', 'Rhyperior Shadow', 'Tyrantrum Shadow', 'Mega Tyranitar',
+      'Gigalith Shadow', 'Mega Aerodactyl', 'Tyranitar Shadow', 'Rampardos', 'Rhyperior',
     ],
     'Steel': [
-      'Metagross', 'Metagross', 'Metagross', 'Metagross', 'Metagross',
-      'Metagross', 'Metagross', 'Metagross', 'Jirachi', 'Metagross',
+      'Zacian', 'Zamazenta', 'Necrozma (Solgaleo)', 'Metagross Shadow', 'Dialga Shadow',
+      'Metagross', 'Excadrill Shadow', 'Dialga', 'Dialga Origen', 'Mega Lucario',
     ],
     'Water': [
-      'Kyogre', 'Kyogre', 'Kyogre', 'Kyogre', 'Kyogre',
-      'Kyogre', 'Kyogre', 'Kyogre', 'Kingler', 'Kyogre',
+      'Mega Primal Kyogre', 'Kyogre Shadow', 'Mega Swampert', 'Mega Blastoise', 'Swampert Shadow',
+      'Samurott Shadow', 'Empoleon Shadow', 'Feraligatr Shadow', 'Mega Gyarados', 'Kyogre',
     ],
   };
 
   // Top megas por tipo (mejor mega de cada tipo para PVE)
   static const Map<String, String> _hardcodedMegas = {
-    'Bug':      'Mega Beedrill',
-    'Dark':     'Mega Tyranitar',
+    'Bug':      'Mega Pinsir',
+    'Dark':     'Mega Absol',
     'Dragon':   'Mega Rayquaza',
     'Electric': 'Mega Manectric',
     'Fairy':    'Mega Gardevoir',
     'Fighting': 'Mega Lucario',
-    'Fire':     'Mega Charizard Y',
+    'Fire':     'Mega Blaziken',
     'Flying':   'Mega Rayquaza',
     'Ghost':    'Mega Gengar',
     'Grass':    'Mega Sceptile',
     'Ground':   'Primal Groudon',
-    'Ice':      'Mega Abomasnow',
+    'Ice':      'Mega Glalie',
     'Poison':   'Mega Beedrill',
-    'Psychic':  'Mega Mewtwo Y',
+    'Psychic':  'Mega Alakazam',
     'Rock':     'Mega Diancie',
-    'Steel':    'Mega Metagross',
+    'Steel':    'Mega Lucario',
     'Water':    'Primal Kyogre',
   };
 
@@ -201,70 +201,150 @@ class TierService {
     final byTypeFinal = <String, List<TierEntry>>{};
 
     _hardcodedTop.forEach((type, names) {
-      final seen    = <String>{};
+      final nameCounts = <String, int>{};
       final entries = <TierEntry>[];
 
       for (int i = 0; i < names.length; i++) {
         final rawName = names[i];
-        final key     = rawName.toLowerCase();
+        final key     = rawName.toLowerCase().trim();
 
-        // Evitar duplicados exactos
-        if (seen.contains(key)) continue;
-        seen.add(key);
+        // Detectar si es Shadow o Mega
+        final isShadowForm = key.contains('shadow');
+        final isMegaForm = key.contains('mega');
+        final keyBase = key.replaceAll('shadow', '').replaceAll('mega', '').trim();
+        final displayName = rawName
+            .replaceAll(RegExp(r'\s*shadow\s*', caseSensitive: false), '')
+            .replaceAll(RegExp(r'\s*mega\s*', caseSensitive: false), '')
+            .trim();
 
-        // Buscar en la API por nombre (búsqueda flexible)
-        final statsData = statsByName[key] ??
-            statsByName.entries
-                .where((e) => e.key.contains(key) || key.contains(e.key))
-                .map((e) => e.value)
-                .firstOrNull;
+        // Contar cuántas veces aparece este nombre (para diferenciar duplicados)
+        final formIndex = nameCounts[keyBase] ?? 0;
+        nameCounts[keyBase] = formIndex + 1;
 
-        final id  = statsData != null ? _toInt(statsData['id']) : 0;
-        final atk = statsData != null ? _toInt(statsData['base_attack']) : 0;
-        final def = statsData != null ? _toInt(statsData['base_defense']) : 1;
-        final sta = statsData != null ? _toInt(statsData['base_stamina']) : 0;
-        final cp  = maxCpByName[key] ??
-            maxCpByName.entries
-                .where((e) => e.key.contains(key) || key.contains(e.key))
-                .map((e) => e.value)
-                .firstOrNull ?? 0;
+        // Si es mega, buscar primero en mega_pokemon.json
+        Map<String, dynamic>? megaData;
+        if (isMegaForm) {
+          for (final m in megaRaw) {
+            final mn = (m['mega_name'] ?? '').toString().toLowerCase();
+            if (mn == key || mn.contains(keyBase)) {
+              megaData = Map<String, dynamic>.from(m as Map);
+              break;
+            }
+          }
+        }
 
-        final pokTypes = typesByName[key] ??
-            typesByName.entries
-                .where((e) => e.key.contains(key) || key.contains(e.key))
-                .map((e) => e.value)
-                .firstOrNull ?? [type];
+        // Búsqueda exacta primero (o usar datos del mega si se encontró)
+        Map<String, dynamic>? statsData = megaData ?? statsByName[keyBase];
 
-        final moves    = movesByName[key] ??
-            movesByName.entries
-                .where((e) => e.key.contains(key) || key.contains(e.key))
-                .map((e) => e.value)
-                .firstOrNull;
+        // Si no encuentra exacto, busca por palabra completa (no substring)
+        if (statsData == null) {
+          for (final entry in statsByName.entries) {
+            final apiName = entry.key;
+            // Coincidencia exacta de palabras: el nombre de la API debe ser igual
+            // o el nombre hardcoded debe ser igual al de la API
+            if (apiName == keyBase) {
+              statsData = entry.value;
+              break;
+            }
+            // Solo si el nombre completo del API está contenido exactamente
+            // Ejemplo: "darmanitan" → "darmanitan" pero NO "darmanitan standard"
+            final apiWords = apiName.split(' ');
+            final keyWords = keyBase.split(' ');
+            if (keyWords.length == 1 && apiWords.first == keyBase && apiWords.length == 1) {
+              statsData = entry.value;
+              break;
+            }
+            if (keyWords.length > 1 && apiName.startsWith(keyBase)) {
+              statsData = entry.value;
+              break;
+            }
+          }
+        }
+
+        // Extraer datos del Pokémon encontrado (o mega)
+        int id, atk, def, sta;
+        if (megaData != null) {
+          id = _toInt(megaData['pokemon_id']);
+          final ms = megaData['stats'] as Map?;
+          atk = ms != null ? _toInt(ms['base_attack']) : 0;
+          def = ms != null ? _toInt(ms['base_defense']) : 1;
+          sta = ms != null ? _toInt(ms['base_stamina']) : 0;
+        } else {
+          id = statsData != null ? _toInt(statsData['id']) : 0;
+          atk = statsData != null ? _toInt(statsData['base_attack']) : 0;
+          def = statsData != null ? _toInt(statsData['base_defense']) : 1;
+          sta = statsData != null ? _toInt(statsData['base_stamina']) : 0;
+        }
+
+        // Max CP: búsqueda exacta primero
+        int cp = maxCpByName[keyBase] ?? 0;
+        if (cp == 0 && id > 0) {
+          // Buscar por ID en maxCpRaw directamente
+          cp = maxCpByName.entries
+              .firstWhere(
+                (e) {
+                  final s = statsByName[e.key];
+                  return s != null && _toInt(s['id']) == id;
+                },
+                orElse: () => MapEntry('', 0),
+              )
+              .value;
+        }
+
+        // Tipos: usar el ID para buscar exacto (o tipos del mega)
+        List<String> pokTypes;
+        if (megaData != null && megaData['type'] != null) {
+          pokTypes = List<String>.from(megaData['type']);
+        } else if (id > 0 && typesById.containsKey(id)) {
+          pokTypes = typesById[id]!;
+        } else {
+          pokTypes = typesByName[keyBase] ?? [type];
+        }
+
+        // Movimientos: usar ID para buscar exacto
+        Map<String, dynamic>? moves;
+        if (id > 0) {
+          // Buscar en movesRaw por pokemon_id directamente
+          for (final m in movesRaw) {
+            if (_toInt(m['pokemon_id']) == id) {
+              moves = Map<String, dynamic>.from(m as Map);
+              break;
+            }
+          }
+        }
+        moves ??= movesByName[keyBase];
 
         final fasts   = moves != null ? List<String>.from(moves['fast_moves'] ?? []) : <String>[];
         final charged = moves != null ? List<String>.from(moves['charged_moves'] ?? []) : <String>[];
 
-        final isShadow = shadowIds.contains(id);
+        final isShadow = shadowIds.contains(id) || isShadowForm;
         final isLeg    = legendaryIds.contains(id);
         final isMyt    = mythicIds.contains(id);
+        final isMega   = isMegaForm; // Solo marcar como mega si se especifica en el nombre
         final rank     = entries.length + 1;
+
+        developer.log(
+          'Type $type rank $rank: "$displayName" (shadow=$isShadow, mega=$isMega) → id=$id atk=$atk cp=$cp',
+          name: 'TierService',
+        );
 
         entries.add(TierEntry(
           id:          id > 0 ? id : (800 + entries.length),
-          name:        rawName,
+          name:        displayName,
           types:       pokTypes,
           baseAttack:  atk,
           baseDefense: def,
           baseStamina: sta,
           maxCp:       cp,
-          score:       (10 - entries.length).toDouble(), // score inverso al rank
-          isMega:      false,
+          score:       (10 - entries.length).toDouble(),
+          isMega:      isMega,
           isShadow:    isShadow,
           isLegendary: isLeg,
           isMythic:    isMyt,
           tier:        _assignTier(rank),
           bestFastMove:    fasts.isNotEmpty ? fasts.first : null,
           bestChargedMove: charged.isNotEmpty ? charged.first : null,
+          formIndex:   formIndex,
         ));
       }
 

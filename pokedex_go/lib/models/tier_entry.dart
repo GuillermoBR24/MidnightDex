@@ -14,6 +14,7 @@ class TierEntry {
   final String tier; // S, A, B, C
   final String? bestFastMove;
   final String? bestChargedMove;
+  final int formIndex; // Para diferenciar duplicados (shadow, gmax, etc)
 
   TierEntry({
     required this.id,
@@ -31,10 +32,13 @@ class TierEntry {
     required this.tier,
     this.bestFastMove,
     this.bestChargedMove,
+    this.formIndex = 0,
   });
 
-  String get imageUrl =>
-      'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/$id.png';
+  String get imageUrl {
+    // Usar el ID base del Pokémon para la imagen (sin sufijos)
+    return 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/$id.png';
+  }
 
   String get label {
     if (isMega) return 'MEGA';
@@ -42,5 +46,12 @@ class TierEntry {
     if (isLegendary) return 'LEGENDARY';
     if (isMythic) return 'MYTHIC';
     return '';
+  }
+
+  /// Retorna el tipo de forma del Pokémon: "NORMAL", "SHADOW", "MEGA", etc
+  String get formType {
+    if (isMega) return 'MEGA';
+    if (isShadow) return 'SHADOW';
+    return 'NORMAL';
   }
 }

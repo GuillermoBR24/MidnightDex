@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 class TierEntry {
   final int id;
   final String name;
@@ -15,6 +17,8 @@ class TierEntry {
   final String? bestFastMove;
   final String? bestChargedMove;
   final int formIndex; // Para diferenciar duplicados (shadow, gmax, etc)
+  final String? imageUrlOverride;
+  final String? tierType; // Tipo para el cual es la mejor mega
 
   TierEntry({
     required this.id,
@@ -33,10 +37,14 @@ class TierEntry {
     this.bestFastMove,
     this.bestChargedMove,
     this.formIndex = 0,
+    this.imageUrlOverride,
+    this.tierType,
   });
 
   String get imageUrl {
-    // Usar el ID base del Pokémon para la imagen (sin sufijos)
+    if (!kIsWeb && imageUrlOverride != null && imageUrlOverride!.isNotEmpty) {
+      return imageUrlOverride!;
+    }
     return 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/$id.png';
   }
 

@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:developer' as developer;
+import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../models/tier_entry.dart';
 
@@ -24,10 +26,10 @@ class TierService {
     ],
     'Dragon': [
       'Eternatus', 'Mega Rayquaza', 'Mega Garchomp', 'Garchomp Shadow', 'Palkia Shadow',
-      'Salamence Shadow', 'Dragonite Shadow', 'Mega Palkia Origen', 'Mega Salamence', 'Dialga Shadow',
+      'Salamence Shadow', 'Dragonite Shadow', 'Palkia Origen', 'Mega Salamence', 'Dialga Shadow',
     ],
     'Electric': [
-      'Regieleky', 'Raikou Shadow', 'Electivire Shadow', 'Xurkitree', 'Mega Manectric',
+      'Regieleki', 'Raikou Shadow', 'Electivire Shadow', 'Xurkitree', 'Mega Manectric',
       'Thundurus Totem', 'Zapdos Shadow', 'Magnezone Shadow', 'Zekrom', 'Luxray Shadow',
     ],
     'Fairy': [
@@ -119,6 +121,42 @@ class TierService {
     return int.tryParse(v.toString()) ?? 0;
   }
 
+  static int _calculateMaxCp(int attack, int defense, int stamina) {
+    if (attack <= 0 || defense <= 0 || stamina <= 0) return 0;
+    const cpm = 0.79030001;
+    final cp = (attack * sqrt(defense) * sqrt(stamina) * cpm * cpm) / 10;
+    final value = cp.floor();
+    return value < 10 ? 10 : value;
+  }
+
+  static String? _resolveMegaArtworkUrl(Map<String, dynamic>? megaData) {
+    if (megaData == null) return null;
+    if (kIsWeb) {
+      // PokemonDB artwork is not CORS-safe for Flutter Web, so fall back to
+      // official artwork on web builds instead of loading a blocked image.
+      return null;
+    }
+
+    final baseName = (megaData['pokemon_name'] ?? '').toString().toLowerCase();
+    final megaName = (megaData['mega_name'] ?? '').toString().toLowerCase();
+    if (baseName.isEmpty || megaName.isEmpty) return null;
+
+    var slug = baseName.replaceAll(RegExp(r"[^a-z0-9 ]"), '').replaceAll(' ', '-');
+    if (megaName.contains('primal')) {
+      slug = '$slug-primal';
+    } else if (megaName.contains('origin')) {
+      slug = '$slug-origin';
+    } else if (megaName.endsWith(' x')) {
+      slug = '$slug-mega-x';
+    } else if (megaName.endsWith(' y')) {
+      slug = '$slug-mega-y';
+    } else {
+      slug = '$slug-mega';
+    }
+
+    return 'https://img.pokemondb.net/artwork/large/$slug.jpg';
+  }
+
   static String _assignTier(int rank) {
     if (rank <= 2) return 'S';
     if (rank <= 5) return 'A';
@@ -142,23 +180,28 @@ class TierService {
     final rarityRaw = await _fetch('pokemon_rarity.json')         as Map<String, dynamic>;
 
     // ── Índices por nombre (insensible a mayúsculas) ──
-    final statsByName  = <String, Map<String, dynamic>>{};
-    final maxCpByName  = <String, int>{};
-    final typesByName  = <String, List<String>>{};
-    final movesByName  = <String, Map<String, dynamic>>{};
-    final shadowIds    = <int>{};
-    final legendaryIds = <int>{};
-    final mythicIds    = <int>{};
+    final statsByName   = <String, Map<String, dynamic>>{};
+    final maxCpByName   = <String, int>{};
+    final maxCpById     = <int, int>{};
+    final typesByName   = <String, List<String>>{};
+    final movesByName   = <String, Map<String, dynamic>>{};
+    final shadowIds     = <int>{};
+    final legendaryIds  = <int>{};
+    final mythicIds     = <int>{};
 
     for (final s in statsRaw) {
-      final name = (s['name'] ?? '').toString().toLowerCase();
+      final name = (s['pokemon_name'] ?? s['name'] ?? '').toString().toLowerCase();
       if (name.isNotEmpty) statsByName[name] = Map<String, dynamic>.from(s as Map);
     }
 
     for (final c in maxCpRaw) {
-      final name = (c['name'] ?? '').toString().toLowerCase();
+      final name = (c['pokemon_name'] ?? c['name'] ?? '').toString().toLowerCase();
+      final pid  = _toInt(c['pokemon_id'] ?? c['id']);
       if (name.isNotEmpty && c['max_cp'] != null) {
         maxCpByName[name] = _toInt(c['max_cp']);
+      }
+      if (pid > 0 && c['max_cp'] != null) {
+        maxCpById[pid] = _toInt(c['max_cp']);
       }
     }
 
@@ -172,9 +215,9 @@ class TierService {
     }
     // Cruzar tipos con nombres via stats
     for (final s in statsRaw) {
-      final name = (s['name'] ?? '').toString().toLowerCase();
-      final id   = _toInt(s['id']);
-      if (name.isNotEmpty && typesById.containsKey(id)) {
+      final name = (s['pokemon_name'] ?? s['name'] ?? '').toString().toLowerCase();
+      final id   = _toInt(s['pokemon_id'] ?? s['id']);
+      if (name.isNotEmpty && id > 0 && typesById.containsKey(id)) {
         typesByName[name] = typesById[id]!;
       }
     }
@@ -226,37 +269,46 @@ class TierService {
         if (isMegaForm) {
           for (final m in megaRaw) {
             final mn = (m['mega_name'] ?? '').toString().toLowerCase();
-            if (mn == key || mn.contains(keyBase)) {
+            // Buscar coincidencias más flexibles para megas
+            final megaBaseName = mn.replaceAll('mega ', '').replaceAll('primal ', '');
+            if (mn == key ||
+                mn.contains(keyBase) ||
+                keyBase.contains(megaBaseName) ||
+                megaBaseName.contains(keyBase)) {
               megaData = Map<String, dynamic>.from(m as Map);
               break;
             }
           }
         }
 
-        // Búsqueda exacta primero (o usar datos del mega si se encontró)
-        Map<String, dynamic>? statsData = megaData ?? statsByName[keyBase];
+        // Búsqueda para normales/shadows: buscar en pokemon_stats.json
+        Map<String, dynamic>? statsData;
+        if (!isMegaForm) {
+          // Búsqueda exacta primero
+          statsData = statsByName[keyBase];
 
-        // Si no encuentra exacto, busca por palabra completa (no substring)
-        if (statsData == null) {
-          for (final entry in statsByName.entries) {
-            final apiName = entry.key;
-            // Coincidencia exacta de palabras: el nombre de la API debe ser igual
-            // o el nombre hardcoded debe ser igual al de la API
-            if (apiName == keyBase) {
-              statsData = entry.value;
-              break;
-            }
-            // Solo si el nombre completo del API está contenido exactamente
-            // Ejemplo: "darmanitan" → "darmanitan" pero NO "darmanitan standard"
-            final apiWords = apiName.split(' ');
-            final keyWords = keyBase.split(' ');
-            if (keyWords.length == 1 && apiWords.first == keyBase && apiWords.length == 1) {
-              statsData = entry.value;
-              break;
-            }
-            if (keyWords.length > 1 && apiName.startsWith(keyBase)) {
-              statsData = entry.value;
-              break;
+          // Si no encuentra exacto, buscar con más flexibilidad
+          if (statsData == null) {
+            for (final entry in statsByName.entries) {
+              final apiName = entry.key;
+              // Coincidencia exacta
+              if (apiName == keyBase) {
+                statsData = entry.value;
+                break;
+              }
+              // Contiene la palabra clave
+              if (apiName.contains(keyBase) || keyBase.contains(apiName)) {
+                statsData = entry.value;
+                break;
+              }
+              // Primera palabra coincide
+              final apiWords = apiName.split(' ');
+              final keyWords = keyBase.split(' ');
+              if (keyWords.isNotEmpty && apiWords.isNotEmpty &&
+                  apiWords.first == keyWords.first) {
+                statsData = entry.value;
+                break;
+              }
             }
           }
         }
@@ -270,38 +322,58 @@ class TierService {
           def = ms != null ? _toInt(ms['base_defense']) : 1;
           sta = ms != null ? _toInt(ms['base_stamina']) : 0;
         } else {
-          id = statsData != null ? _toInt(statsData['id']) : 0;
+          id = statsData != null ? _toInt(statsData['pokemon_id'] ?? statsData['id']) : 0;
           atk = statsData != null ? _toInt(statsData['base_attack']) : 0;
           def = statsData != null ? _toInt(statsData['base_defense']) : 1;
           sta = statsData != null ? _toInt(statsData['base_stamina']) : 0;
         }
 
-        // Max CP: búsqueda exacta primero
-        int cp = maxCpByName[keyBase] ?? 0;
-        if (cp == 0 && id > 0) {
-          // Buscar por ID en maxCpRaw directamente
-          cp = maxCpByName.entries
-              .firstWhere(
-                (e) {
-                  final s = statsByName[e.key];
-                  return s != null && _toInt(s['id']) == id;
-                },
-                orElse: () => MapEntry('', 0),
-              )
-              .value;
+        // Max CP: calculado para megas, sino buscar CP normal
+        int cp = 0;
+        if (megaData != null) {
+          cp = _calculateMaxCp(atk, def, sta);
+          if (cp == 0 && id > 0) {
+            cp = maxCpById[id] ?? 0;
+          }
+        } else {
+          cp = maxCpByName[keyBase] ?? 0;
+          if (cp == 0 && id > 0) {
+            cp = maxCpById[id] ?? 0;
+          }
+          // Si aún no hay CP, buscar por nombre más flexible
+          if (cp == 0) {
+            for (final entry in maxCpByName.entries) {
+              final apiName = entry.key;
+              if (apiName.contains(keyBase) || keyBase.contains(apiName)) {
+                cp = entry.value;
+                break;
+              }
+            }
+          }
         }
 
-        // Tipos: usar el ID para buscar exacto (o tipos del mega)
+        // Tipos: usar el ID para buscar exacto (o tipos del mega), o buscar por nombre
         List<String> pokTypes;
         if (megaData != null && megaData['type'] != null) {
           pokTypes = List<String>.from(megaData['type']);
         } else if (id > 0 && typesById.containsKey(id)) {
           pokTypes = typesById[id]!;
         } else {
-          pokTypes = typesByName[keyBase] ?? [type];
+          // Buscar por nombre más flexible
+          pokTypes = typesByName[keyBase] ?? [];
+          if (pokTypes.isEmpty) {
+            for (final entry in typesByName.entries) {
+              if (entry.key.contains(keyBase) || keyBase.contains(entry.key)) {
+                pokTypes = entry.value;
+                break;
+              }
+            }
+          }
+          // Si aún no hay tipos, usar el tipo del tier como fallback
+          pokTypes = pokTypes.isNotEmpty ? pokTypes : [type];
         }
 
-        // Movimientos: usar ID para buscar exacto
+        // Movimientos: usar ID para buscar exacto, o buscar por nombre más flexible
         Map<String, dynamic>? moves;
         if (id > 0) {
           // Buscar en movesRaw por pokemon_id directamente
@@ -312,21 +384,83 @@ class TierService {
             }
           }
         }
-        moves ??= movesByName[keyBase];
+        // Si no se encontró por ID, buscar por nombre
+        if (moves == null) {
+          moves = movesByName[keyBase];
+          if (moves == null) {
+            for (final entry in movesByName.entries) {
+              if (entry.key.contains(keyBase) || keyBase.contains(entry.key)) {
+                moves = entry.value;
+                break;
+              }
+            }
+          }
+        }
 
         final fasts   = moves != null ? List<String>.from(moves['fast_moves'] ?? []) : <String>[];
         final charged = moves != null ? List<String>.from(moves['charged_moves'] ?? []) : <String>[];
 
         final isShadow = shadowIds.contains(id) || isShadowForm;
+        
+        // Aplicar boost de +20% ATK para shadows
+        if (isShadow) {
+          atk = (atk * 1.2).toInt();
+        }
+        
         final isLeg    = legendaryIds.contains(id);
         final isMyt    = mythicIds.contains(id);
         final isMega   = isMegaForm; // Solo marcar como mega si se especifica en el nombre
         final rank     = entries.length + 1;
 
         developer.log(
-          'Type $type rank $rank: "$displayName" (shadow=$isShadow, mega=$isMega) → id=$id atk=$atk cp=$cp',
+          'Type $type rank $rank: "$displayName" (shadow=$isShadow, mega=$isMega) → id=$id atk=$atk def=$def sta=$sta cp=$cp types=$pokTypes',
           name: 'TierService',
         );
+
+        print('======= TIER DEBUG =======');
+        print('type: $type');
+        print('rank: $rank');
+        print('rawName: $rawName');
+        print('displayName: $displayName');
+        print('keyBase: $keyBase');
+        print('isMegaForm: $isMegaForm, isShadowForm: $isShadowForm');
+        print('megaData: ${megaData != null}, statsData: ${statsData != null}, moves: ${moves != null}');
+        print('id: $id  atk: $atk  def: $def  sta: $sta  cp: $cp');
+        print('types: $pokTypes');
+        print('fastMove: ${fasts.isNotEmpty ? fasts.first : '-'}');
+        print('chargedMove: ${charged.isNotEmpty ? charged.first : '-'}');
+        print('==========================');
+
+        // Si no se encontraron stats básicos, intentar buscar con nombres alternativos
+        if (atk == 0 && def == 1 && sta == 0 && !isMegaForm) {
+          developer.log(
+            'WARNING: No stats found for "$displayName" (keyBase: "$keyBase"), trying alternative search...',
+            name: 'TierService',
+          );
+
+          // Intentar buscar con variaciones del nombre
+          final alternatives = [
+            keyBase.replaceAll(' ', ''),
+            keyBase.replaceAll(' ', '-'),
+            keyBase.split(' ').first,
+          ];
+
+          for (final alt in alternatives) {
+            if (statsByName.containsKey(alt)) {
+              final altData = statsByName[alt]!;
+              atk = _toInt(altData['base_attack']);
+              def = _toInt(altData['base_defense']);
+              sta = _toInt(altData['base_stamina']);
+              id = _toInt(altData['id']);
+
+              developer.log(
+                'FOUND alternative stats for "$displayName" using "$alt": atk=$atk def=$def sta=$sta',
+                name: 'TierService',
+              );
+              break;
+            }
+          }
+        }
 
         entries.add(TierEntry(
           id:          id > 0 ? id : (800 + entries.length),
@@ -345,6 +479,7 @@ class TierService {
           bestFastMove:    fasts.isNotEmpty ? fasts.first : null,
           bestChargedMove: charged.isNotEmpty ? charged.first : null,
           formIndex:   formIndex,
+          imageUrlOverride: isMega ? _resolveMegaArtworkUrl(megaData) : null,
         ));
       }
 
@@ -363,7 +498,14 @@ class TierService {
       Map<String, dynamic>? megaData;
       for (final m in megaRaw) {
         final mn = (m['mega_name'] ?? '').toString().toLowerCase();
-        if (mn == key || mn.contains(key.replaceAll('mega ', '').replaceAll('primal ', ''))) {
+        final keyLower = key.toLowerCase();
+        // Búsqueda más flexible para megas
+        final megaBaseName = mn.replaceAll('mega ', '').replaceAll('primal ', '');
+        final keyBaseName = keyLower.replaceAll('mega ', '').replaceAll('primal ', '');
+        if (mn == keyLower ||
+            mn.contains(keyBaseName) ||
+            keyBaseName.contains(megaBaseName) ||
+            megaBaseName.contains(keyBaseName)) {
           megaData = Map<String, dynamic>.from(m as Map);
           break;
         }
@@ -388,10 +530,10 @@ class TierService {
       final moves   = pid > 0 ? movesByName.entries
           .where((e) {
             final s = statsRaw.firstWhere(
-              (x) => _toInt(x['id']) == pid,
+              (x) => _toInt(x['pokemon_id'] ?? x['id']) == pid,
               orElse: () => <String, dynamic>{},
             );
-            return (s['name'] ?? '').toString().toLowerCase() == e.key;
+            return (s['pokemon_name'] ?? s['name'] ?? '').toString().toLowerCase() == e.key;
           })
           .map((e) => e.value)
           .firstOrNull : null;
@@ -406,7 +548,7 @@ class TierService {
         baseAttack:  atk,
         baseDefense: def,
         baseStamina: sta,
-        maxCp:       0,
+        maxCp:       _calculateMaxCp(atk, def, sta),
         score:       (atk * atk * sta.toDouble()) / def,
         isMega:      true,
         isShadow:    false,
@@ -415,6 +557,8 @@ class TierService {
         tier:        'S',
         bestFastMove:    fasts.isNotEmpty ? fasts.first : null,
         bestChargedMove: charged.isNotEmpty ? charged.first : null,
+        imageUrlOverride: _resolveMegaArtworkUrl(megaData),
+        tierType:    type,
       ));
     });
 

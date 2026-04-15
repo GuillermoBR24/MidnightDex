@@ -25,7 +25,7 @@ class _TierScreenState extends State<TierScreen>
   static const List<String> _types = [
     'Fire','Water','Grass','Electric','Ice','Fighting',
     'Poison','Ground','Flying','Psychic','Bug','Rock',
-    'Ghost','Dragon','Dark','Steel','Fairy','Normal',
+    'Ghost','Dragon','Dark','Steel','Fairy',
   ];
 
   @override
@@ -406,6 +406,30 @@ class _TierCard extends StatelessWidget {
                           ),
                         ),
                       ),
+                    // Badge: tipo del tier para megas
+                    if (entry.tierType != null)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
+                        margin: const EdgeInsets.only(left: 4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFD700).withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(5),
+                          border: Border.all(
+                            color: const Color(0xFFFFD700).withOpacity(0.5),
+                            width: 1,
+                          ),
+                        ),
+                        child: Text(
+                          entry.tierType!,
+                          style: const TextStyle(
+                            color: Color(0xFFFFD700),
+                            fontSize: 8,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ),
                   ],
                 ),
                 const SizedBox(height: 4),
@@ -474,8 +498,8 @@ class _TierCard extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 entry.maxCp > 0 ? '${entry.maxCp} CP' : 'MEGA',
-                style: TextStyle(
-                  color: primary,
+                style: const TextStyle(
+                  color: Colors.white,
                   fontSize: 9,
                   fontWeight: FontWeight.w700,
                 ),

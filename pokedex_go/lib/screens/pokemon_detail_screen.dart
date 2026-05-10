@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../models/pokemon.dart';
+import '../models/iv_config.dart';
 import '../theme/app_theme.dart';
 import '../widgets/type_badge.dart';
 import '../widgets/stat_bar.dart';
@@ -13,7 +14,9 @@ class PokemonDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return pokemon.isReleased ? _ReleasedView(pokemon: pokemon) : _UnreleasedView(pokemon: pokemon);
+    return pokemon.isReleased
+        ? _ReleasedView(pokemon: pokemon)
+        : _UnreleasedView(pokemon: pokemon);
   }
 }
 
@@ -31,11 +34,16 @@ class _UnreleasedView extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: AppTheme.bgDark,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: AppTheme.accentBlue),
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            color: AppTheme.accentBlue,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text('#${pokemon.paddedId} ${pokemon.name}',
-            style: const TextStyle(color: Color(0xFF4A4A65))),
+        title: Text(
+          '#${pokemon.paddedId} ${pokemon.name}',
+          style: const TextStyle(color: Color(0xFF4A4A65)),
+        ),
       ),
       body: Center(
         child: Column(
@@ -47,12 +55,32 @@ class _UnreleasedView extends StatelessWidget {
               children: [
                 ColorFiltered(
                   colorFilter: const ColorFilter.matrix([
-                    0.2126, 0.7152, 0.0722, 0, 0,
-                    0.2126, 0.7152, 0.0722, 0, 0,
-                    0.2126, 0.7152, 0.0722, 0, 0,
-                    0,      0,      0,      0.2, 0,
+                    0.2126,
+                    0.7152,
+                    0.0722,
+                    0,
+                    0,
+                    0.2126,
+                    0.7152,
+                    0.0722,
+                    0,
+                    0,
+                    0.2126,
+                    0.7152,
+                    0.0722,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0.2,
+                    0,
                   ]),
-                  child: Image.network(pokemon.imageUrl, height: 160, fit: BoxFit.contain),
+                  child: Image.network(
+                    pokemon.imageUrl,
+                    height: 160,
+                    fit: BoxFit.contain,
+                  ),
                 ),
                 Container(
                   width: 160,
@@ -73,9 +101,15 @@ class _UnreleasedView extends StatelessWidget {
                     color: const Color(0xFF0D0D18).withOpacity(0.85),
                     shape: BoxShape.circle,
                     border: Border.all(
-                        color: const Color(0xFF2D2D45), width: 2),
+                      color: const Color(0xFF2D2D45),
+                      width: 2,
+                    ),
                   ),
-                  child: const Icon(Icons.lock, color: Color(0xFF4A4A65), size: 36),
+                  child: const Icon(
+                    Icons.lock,
+                    color: Color(0xFF4A4A65),
+                    size: 36,
+                  ),
                 ),
               ],
             ).animate().fadeIn(duration: 600.ms),
@@ -111,8 +145,11 @@ class _UnreleasedView extends StatelessWidget {
                       color: const Color(0xFF1A1A2A),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.catching_pokemon,
-                        color: Color(0xFF3A3A55), size: 32),
+                    child: const Icon(
+                      Icons.catching_pokemon,
+                      color: Color(0xFF3A3A55),
+                      size: 32,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   const Text(
@@ -139,12 +176,16 @@ class _UnreleasedView extends StatelessWidget {
                   if (pokemon.generation != null)
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 6),
+                        horizontal: 14,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: const Color(0xFF1A1A2A),
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
-                            color: const Color(0xFF2A2A40), width: 1),
+                          color: const Color(0xFF2A2A40),
+                          width: 1,
+                        ),
                       ),
                       child: Text(
                         pokemon.generation!,
@@ -176,64 +217,357 @@ class _ReleasedView extends StatefulWidget {
   State<_ReleasedView> createState() => _ReleasedViewState();
 }
 
-
 class _ReleasedViewState extends State<_ReleasedView> {
   bool _showShiny = false;
+  bool _showMega = false;
+  String _selectedMegaForm = 'X';
+  int _selectedLevel = 50;
+  
+  // IVs por defecto (máximos)
+  int _atkIv = 15;
+  int _defIv = 15;
+  int _staIv = 15;
 
-  void _toggleShiny() {
-    if (widget.pokemon.possibleShiny == true) {
-      setState(() => _showShiny = !_showShiny);
+  Map<String, int> _getEffectiveStats() {
+    int atk = widget.pokemon.baseAttack ?? 0;
+    int def = widget.pokemon.baseDefense ?? 0;
+    int sta = widget.pokemon.baseStamina ?? 0;
+
+    if (_showMega) {
+      // Buff oficial de Mega Evolución en GO: +20% a stats base
+      atk = (atk * 1.2).round();
+      def = (def * 1.2).round();
+      sta = (sta * 1.2).round();
     }
-  }
-    /// Calcula CP para un nivel específico
-  int _calculateCpAtLevel(int level) {
-    final attack = widget.pokemon.baseAttack;
-    final defense = widget.pokemon.baseDefense;
-    final stamina = widget.pokemon.baseStamina;
-    
-    if (attack == null || defense == null || stamina == null) return 0;
-    
-    // Tabla simplificada de CPM
-    final cpm = _getCpmForLevel(level);
-    
-    final cp = (attack * 
-               sqrt(defense.toDouble()) * 
-               sqrt(stamina.toDouble()) * 
-               cpm * cpm) / 10;
-    
-    return cp.floor();
+    return {'atk': atk, 'def': def, 'sta': sta};
   }
 
-  /// Obtiene el CPM (CP Multiplier) para un nivel dado
-  double _getCpmForLevel(int level) {
-    // Valores oficiales de CPM
-    const cpmTable = {
-      40: 0.79030001,
-      41: 0.79530001,
-      42: 0.80030000,
-      43: 0.80530000,
-      44: 0.81030000,
-      45: 0.81530000,
-      46: 0.82030000,
-      47: 0.82530000,
-      48: 0.83030000,
-      49: 0.83530000,
+  /// Obtiene los tipos del Pokémon considerando Mega Evoluciones
+  List<String> _getCurrentTypes() {
+    // Si no es Mega, devuelve los tipos normales
+    if (!_showMega || !_isMegaAvailable) {
+      return widget.pokemon.types;
+    }
+    
+    final id = widget.pokemon.id;
+    
+    // 👇 Tipos especiales para Mega Evoluciones que cambian de tipo
+    final megaTypes = <int, List<String>>{
+      // Charizard X: Fuego/Dragón
+      6: _selectedMegaForm == 'X' 
+          ? ['Fire', 'Dragon'] 
+          : ['Fire', 'Flying'],  // Charizard Y mantiene tipos
+      
+      // Gyarados Mega: Agua/Siniestro
+      130: ['Water', 'Dark'],
+      
+      // Sceptile Mega: Planta/Dragón
+      254: ['Grass', 'Dragon'],
+      
+      // Altaria Mega: Dragón/Hada
+      334: ['Dragon', 'Fairy'],
+      
+      // Mewtwo X: Psíquico/Lucha
+      150: _selectedMegaForm == 'X' 
+          ? ['Psychic', 'Fighting'] 
+          : ['Psychic'],  // Mewtwo Y mantiene tipo
+      
+      // Groudon Primal: Tierra/Fuego
+      383: ['Ground', 'Fire'],
+      
+      // Kyogre Primal: Agua (mantiene)
+      382: ['Water'],
     };
     
-    return cpmTable[level] ?? 0.79030001; // Default a nivel 40
+    return megaTypes[id] ?? widget.pokemon.types;
+  }
+  
+  static const Set<int> _dualMegaIds = {6, 150};
+
+  static const Set<int> _megaIds = {
+    3,   // Venusaur
+    6,   // Charizard
+    9,   // Blastoise
+    15,  // Beedrill
+    18,  // Pidgeot
+    65,  // Alakazam
+    80,  // Slowbro
+    94,  // Gengar
+    115, // Kangaskhan
+    127, // Pinsir
+    130, // Gyarados
+    142, // Aerodactyl
+    149, // Dragonite
+    150, // Mewtwo
+    181, // Ampharos
+    208, // Steelix
+    212, // Scizor
+    214, // Heracross
+    229, // Houndoom
+    248, // Tyranitar
+    254, // Sceptile
+    257, // Blaziken
+    260, // Swampert
+    282, // Gardevoir
+    302, // Sableye
+    303, // Mawile
+    306, // Aggron
+    308, // Medicham
+    310, // Manectric
+    319, // Sharpedo
+    323, // Camerupt
+    334, // Altaria
+    354, // Banette
+    359, // Absol
+    362, // Glalie
+    373, // Salamence
+    376, // Metagross
+    380, // Latias
+    381, // Latios
+    382, // Kyogre (Primigenio)
+    383, // Groudon (Primigenio)
+    384, // Rayquaza
+    428, // Lopunny
+    445, // Garchomp
+    448, // Lucario
+    460, // Abomasnow
+    531, // Audino
+    719, // Diancie
+    796, // Malamar
+    71,  // Victreebel
+  };
+  
+  bool get _isMegaAvailable => _megaIds.contains(widget.pokemon.id);
+  bool get _hasDualMega => _dualMegaIds.contains(widget.pokemon.id);
+
+Widget _buildMegaToggleButton(String form) {
+    final isSelected = _selectedMegaForm == form;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedMegaForm = form;
+        });
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        decoration: BoxDecoration(
+          color: isSelected 
+              ? const Color(0xFF00E5FF).withOpacity(0.25)
+              : AppTheme.bgSurface,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isSelected 
+                ? const Color(0xFF00E5FF)
+                : AppTheme.borderColor,
+            width: isSelected ? 1.5 : 1,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: const Color(0xFF00E5FF).withOpacity(0.3),
+                    blurRadius: 8,
+                    spreadRadius: 1,
+                  )
+                ]
+              : null,
+        ),
+        child: Text(
+          '✨ MEGA $form',
+          style: TextStyle(
+            color: isSelected 
+                ? const Color(0xFF00E5FF)
+                : AppTheme.textSecond,
+            fontSize: 11,
+            fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+          ),
+        ),
+      ),
+    );
   }
 
-  String get _currentImageUrl {
-    if (!_showShiny || widget.pokemon.possibleShiny != true) {
-      return widget.pokemon.imageUrl;
+  Widget _buildPokemonImage(Color primary) {
+    // 👇 Si es Mega, usa asset local
+    final megaAssetPath = _getMegaAssetPath();
+    if (megaAssetPath != null) {
+      return Image.asset(
+        megaAssetPath,
+        height: 210,
+        fit: BoxFit.contain,
+        errorBuilder: (_, __, ___) => _buildPlaceholderImage(primary),
+      ).animate().fadeIn(duration: 500.ms).scale(begin: const Offset(0.8, 0.8));
     }
-    return widget.pokemon.shinyImageUrl;
+    
+    // 👇 Si es Shiny, usa URL de shiny
+    if (_showShiny && widget.pokemon.possibleShiny == true) {
+      return CachedNetworkImage(
+        imageUrl: widget.pokemon.shinyImageUrl,
+        height: 210,
+        fit: BoxFit.contain,
+        errorWidget: (_, __, ___) {
+          return CachedNetworkImage(
+            imageUrl: widget.pokemon.shinyImageUrlFallback,
+            height: 210,
+            fit: BoxFit.contain,
+            errorWidget: (_, __, ___) => _buildPlaceholderImage(primary),
+          );
+        },
+      ).animate().fadeIn(duration: 500.ms).scale(begin: const Offset(0.8, 0.8));
+    }
+    
+    // 👇 Por defecto, usa imagen normal
+    return CachedNetworkImage(
+      imageUrl: widget.pokemon.imageUrl,
+      height: 210,
+      fit: BoxFit.contain,
+      errorWidget: (_, __, ___) => _buildPlaceholderImage(primary),
+    ).animate().fadeIn(duration: 500.ms).scale(begin: const Offset(0.8, 0.8));
   }
 
   @override
-  Widget build(BuildContext context) {  // 👇 AQUÍ va TODO el build
-    final primary = widget.pokemon.types.isNotEmpty
-        ? AppTheme.getTypeColor(widget.pokemon.types.first)
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  String? _getMegaAssetPath() {
+    if (!_showMega || !_isMegaAvailable) return null;
+    
+    final id = widget.pokemon.id;
+    String path;
+    
+    if (_hasDualMega) {
+      path = 'assets/megas/${id}_${_selectedMegaForm.toLowerCase()}.png';
+    } else {
+      path = 'assets/megas/$id.png';
+    }
+    
+    // 👇 Debug: imprime la ruta en consola
+    debugPrint('🔍 Mega asset path: $path');
+    
+    return path;
+  }
+
+  void _toggleShiny() {
+    if (widget.pokemon.possibleShiny == true) {
+      setState(() {
+        _showShiny = !_showShiny;
+        if (_showShiny) _showMega = false;
+      });
+    }
+  }
+
+  void _toggleMega() {
+    if (_isMegaAvailable) {
+      setState(() {
+        _showMega = !_showMega;
+        if (_showMega) _showShiny = false;
+      });
+    }
+  }
+
+  void _toggleMegaForm() {
+    setState(() {
+      _selectedMegaForm = _selectedMegaForm == 'X' ? 'Y' : 'X';
+    });
+  }
+
+String get _currentImageUrl {
+  if (_showMega && _isMegaAvailable) {
+    if (_hasDualMega) {
+      return 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/mega-${_selectedMegaForm.toLowerCase()}/${widget.pokemon.id}.png';
+    }
+    return 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/mega/${widget.pokemon.id}.png';
+  }
+  if (_showShiny && widget.pokemon.possibleShiny == true) {
+    return widget.pokemon.shinyImageUrl;
+  }
+  return widget.pokemon.imageUrl;
+}
+
+  int get _currentCp {
+    final s = _getEffectiveStats();
+    final atk = s['atk']! + _atkIv;
+    final def = s['def']! + _defIv;
+    final sta = s['sta']! + _staIv;
+    
+    final cpm = Pokemon.getCpmForLevel(_selectedLevel);
+    
+    if (atk <= 0 || def <= 0 || sta <= 0) return 0;
+    final cp = (atk * sqrt(def.toDouble()) * sqrt(sta.toDouble()) * cpm * cpm) / 10;
+    return cp.floor();
+  }
+
+  // Widget compacto para selector X/Y en la AppBar (más pequeño)
+  Widget _buildCompactMegaFormButton(String form) {
+    final isSelected = _selectedMegaForm == form;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedMegaForm = form;
+        });
+      },
+      child: Container(
+        width: 24,  // 👈 Más pequeño
+        height: 18,  // 👈 Más pequeño
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: isSelected 
+              ? const Color(0xFF00E5FF).withOpacity(0.2)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(3),  // 👈 Radio reducido
+        ),
+        child: Text(
+          form,
+          style: TextStyle(
+            color: isSelected 
+                ? const Color(0xFF00E5FF)
+                : AppTheme.textSecond,
+            fontSize: 9,  // 👈 Fuente más pequeña
+            fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMegaFormButton(String form) {
+    final isSelected = _selectedMegaForm == form;
+    return GestureDetector(
+      onTap: _toggleMegaForm,
+      child: Container(
+        width: 28,
+        height: 24,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: isSelected 
+              ? const Color(0xFF00E5FF).withOpacity(0.2)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Text(
+          form,
+          style: TextStyle(
+            color: isSelected 
+                ? const Color(0xFF00E5FF)
+                : AppTheme.textSecond,
+            fontSize: 11,
+            fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final currentTypes = _getCurrentTypes();
+    final primary = currentTypes.isNotEmpty
+        ? AppTheme.getTypeColor(currentTypes.first)
         : AppTheme.accentBlue;
 
     return Scaffold(
@@ -250,32 +584,74 @@ class _ReleasedViewState extends State<_ReleasedView> {
               onPressed: () => Navigator.pop(context),
             ),
             actions: [
-              if (widget.pokemon.possibleShiny == true)
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  child: IconButton(
-                    key: ValueKey<bool>(_showShiny),
-                    icon: Icon(
-                      Icons.auto_awesome,
-                      color: _showShiny 
-                          ? const Color(0xFFFFD700)
-                          : AppTheme.textSecond,
-                      size: 26,
-                      shadows: _showShiny
-                          ? [
-                              Shadow(
-                                color: const Color(0xFFFFD700).withOpacity(0.6),
-                                blurRadius: 10,
-                              )
-                            ]
-                          : [],
+            // 👇 Botón Mega Evolución
+            if (_isMegaAvailable)
+              Container(
+                margin: const EdgeInsets.only(right: 4),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Botón principal Mega
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 300),
+                      child: IconButton(
+                        key: ValueKey<bool>(_showMega),
+                        icon: ColorFiltered(
+                        colorFilter: ColorFilter.mode(
+                          _showMega 
+                              ? const Color(0xFF00E5FF)
+                              : AppTheme.textSecond, 
+                          BlendMode.srcIn,
+                        ),
+                        child: Image.asset(
+                          'assets/mega.png',
+                          width: 24,
+                          height: 24,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                        tooltip: _showMega ? 'Ver normal' : 'Ver Mega',
+                        onPressed: _toggleMega,
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(
+                          minWidth: 40,
+                          minHeight: 40,
+                        ),
+                      ),
                     ),
-                    tooltip: _showShiny ? 'Ver normal' : 'Ver shiny',
-                    onPressed: _toggleShiny,
+                    // 👇 Selector X/Y más compacto (solo cuando Mega está activo)
+                    if (_showMega && _hasDualMega)
+                      const SizedBox.shrink(),
+                  ],
+                ),
+              ),
+            
+            // 👇 Botón Shiny
+            if (widget.pokemon.possibleShiny == true)
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                child: IconButton(
+                  key: ValueKey<bool>(_showShiny),
+                  icon: Icon(
+                    Icons.auto_awesome,
+                    color: _showShiny ? const Color(0xFFFFD700) : AppTheme.textSecond,
+                    size: 24,  // 👈 Reducido de 26 a 24
+                    shadows: _showShiny
+                        ? [Shadow(color: const Color(0xFFFFD700).withOpacity(0.6), blurRadius: 10)]
+                        : [],
+                  ),
+                  tooltip: _showShiny ? 'Ver normal' : 'Ver shiny',
+                  onPressed: _toggleShiny,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(
+                    minWidth: 40,
+                    minHeight: 40,
                   ),
                 ),
-              const SizedBox(width: 8),
-            ],
+              ),
+            const SizedBox(width: 4),  // 👈 Reducido de 8 a 4
+          ],
             flexibleSpace: FlexibleSpaceBar(
               background: Stack(
                 alignment: Alignment.center,
@@ -286,50 +662,23 @@ class _ReleasedViewState extends State<_ReleasedView> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: primary.withOpacity(0.07),
-                      border: Border.all(
-                          color: primary.withOpacity(0.15), width: 2),
+                      border: Border.all(color: primary.withOpacity(0.15), width: 2),
                     ),
                   ),
-                  
-                  // 👇 IMAGEN CON TOGGLE
                   GestureDetector(
                     onTap: widget.pokemon.possibleShiny == true ? _toggleShiny : null,
-                    child: CachedNetworkImage(
-                      imageUrl: _currentImageUrl,
-                      height: 210,
-                      fit: BoxFit.contain,
-                      errorWidget: (_, __, ___) {
-                        if (_showShiny && widget.pokemon.possibleShiny == true) {
-                          return CachedNetworkImage(
-                            imageUrl: widget.pokemon.shinyImageUrlFallback,
-                            height: 210,
-                            fit: BoxFit.contain,
-                            errorWidget: (_, __, ___) => 
-                                _buildPlaceholderImage(primary),
-                          );
-                        }
-                        return _buildPlaceholderImage(primary);
-                      },
-                    ).animate().fadeIn(duration: 500.ms).scale(
-                        begin: const Offset(0.8, 0.8)),
+                    child: _buildPokemonImage(primary),
                   ),
-                  
-                  // Badges de rareza
                   if (widget.pokemon.isLegendary || widget.pokemon.isMythic)
                     Positioned(
                       bottom: 30,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 5),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
                         decoration: BoxDecoration(
-                          color: widget.pokemon.isMythic
-                              ? const Color(0xFF2D1A3E)
-                              : const Color(0xFF1A2A1A),
+                          color: widget.pokemon.isMythic ? const Color(0xFF2D1A3E) : const Color(0xFF1A2A1A),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: widget.pokemon.isMythic
-                                ? const Color(0xFFA855F7)
-                                : const Color(0xFFFFD700),
+                            color: widget.pokemon.isMythic ? const Color(0xFFA855F7) : const Color(0xFFFFD700),
                             width: 1,
                           ),
                         ),
@@ -337,21 +686,15 @@ class _ReleasedViewState extends State<_ReleasedView> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
-                              widget.pokemon.isMythic
-                                  ? Icons.auto_awesome
-                                  : Icons.star,
-                              color: widget.pokemon.isMythic
-                                  ? const Color(0xFFA855F7)
-                                  : const Color(0xFFFFD700),
+                              widget.pokemon.isMythic ? Icons.auto_awesome : Icons.star,
+                              color: widget.pokemon.isMythic ? const Color(0xFFA855F7) : const Color(0xFFFFD700),
                               size: 12,
                             ),
                             const SizedBox(width: 5),
                             Text(
                               widget.pokemon.isMythic ? 'Mythic' : 'Legendary',
                               style: TextStyle(
-                                color: widget.pokemon.isMythic
-                                    ? const Color(0xFFA855F7)
-                                    : const Color(0xFFFFD700),
+                                color: widget.pokemon.isMythic ? const Color(0xFFA855F7) : const Color(0xFFFFD700),
                                 fontSize: 11,
                                 fontWeight: FontWeight.w800,
                               ),
@@ -365,7 +708,7 @@ class _ReleasedViewState extends State<_ReleasedView> {
             ),
           ),
 
-          // ─── CONTENIDO PRINCIPAL (esto es lo que te faltaba) ───
+          // ─── CONTENIDO PRINCIPAL ───
           SliverToBoxAdapter(
             child: Container(
               decoration: const BoxDecoration(
@@ -381,51 +724,19 @@ class _ReleasedViewState extends State<_ReleasedView> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Expanded(
-                          child: Text(
-                            widget.pokemon.name,  // 👈 Usa widget.pokemon
-                            style: const TextStyle(
-                              color: AppTheme.textPrimary,
-                              fontSize: 28,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                        ),
-                        Text(
-                          '#${widget.pokemon.paddedId}',
-                          style: TextStyle(
-                            color: primary,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
+                        Expanded(child: Text(widget.pokemon.name, style: const TextStyle(color: AppTheme.textPrimary, fontSize: 28, fontWeight: FontWeight.w800))),
+                        Text('#${widget.pokemon.paddedId}', style: TextStyle(color: primary, fontSize: 20, fontWeight: FontWeight.w800)),
                       ],
                     ),
                     const SizedBox(height: 4),
-
-                    // Generación
                     if (widget.pokemon.generation != null)
-                      Text(
-                        widget.pokemon.generation!,
-                        style: const TextStyle(
-                          color: AppTheme.textSecond,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
+                      Text(widget.pokemon.generation!, style: const TextStyle(color: AppTheme.textSecond, fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 0.5)),
                     const SizedBox(height: 12),
-
-                    // Tipos
                     Wrap(
-                      spacing: 8,
-                      children: widget.pokemon.types
-                          .map((t) => TypeBadge(type: t))
-                          .toList(),
+                      spacing: 8, 
+                      children: _getCurrentTypes().map((t) => TypeBadge(type: t)).toList()
                     ),
                     const SizedBox(height: 16),
-
-                    // Badges de características
                     _BadgesRow(pokemon: widget.pokemon),
                     const SizedBox(height: 24),
 
@@ -435,114 +746,168 @@ class _ReleasedViewState extends State<_ReleasedView> {
                       const SizedBox(height: 10),
                       Row(
                         children: [
-                          Expanded(
-                            child: _InfoTile(
-                              icon: Icons.height,
-                              label: 'Altura',
-                              value: '${widget.pokemon.pokedexHeightM!.toStringAsFixed(1)} m',
-                              color: primary,
-                            ),
-                          ),
+                          Expanded(child: _InfoTile(icon: Icons.height, label: 'Altura', value: '${widget.pokemon.pokedexHeightM!.toStringAsFixed(1)} m', color: primary)),
                           const SizedBox(width: 12),
-                          Expanded(
-                            child: _InfoTile(
-                              icon: Icons.monitor_weight_outlined,
-                              label: 'Peso',
-                              value: '${widget.pokemon.pokedexWeightKg!.toStringAsFixed(1)} kg',
-                              color: primary,
-                            ),
-                          ),
+                          Expanded(child: _InfoTile(icon: Icons.monitor_weight_outlined, label: 'Peso', value: '${widget.pokemon.pokedexWeightKg!.toStringAsFixed(1)} kg', color: primary)),
                         ],
                       ),
                       const SizedBox(height: 20),
                     ],
 
-                    // ── Combat Power ──
+                    // ── Combat Power con IVs manuales ──
                     _SectionTitle(title: 'Combat Power'),
                     const SizedBox(height: 10),
+                    // CP Calculado
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                       decoration: BoxDecoration(
                         color: AppTheme.bgSurface,
                         borderRadius: BorderRadius.circular(14),
-                        border: Border.all(
-                            color: primary.withOpacity(0.35), width: 1.5),
+                        border: Border.all(color: primary.withOpacity(0.35), width: 1.5),
                       ),
                       child: Column(
                         children: [
-                          // CP Principal (Nivel 50)
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.bolt, color: primary, size: 22),
+                              Icon(Icons.bolt, color: primary, size: 24),
                               const SizedBox(width: 8),
-                              Text(
-                                '${widget.pokemon.calculatedMaxCp} CP',
-                                style: TextStyle(
-                                  color: primary,
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: Colors.green.withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(4),
-                                  border: Border.all(color: Colors.green, width: 1),
-                                ),
-                                child: const Text(
-                                  '100% IV',
-                                  style: TextStyle(
-                                    color: Colors.green,
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ),
+                              Text('$_currentCp CP', style: TextStyle(color: primary, fontSize: 28, fontWeight: FontWeight.w800)),
                             ],
                           ),
-                          
-                          // CP Nivel 40 (opcional)
-                          if (widget.pokemon.baseAttack != null)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 6),
-                              child: Text(
-                                'Nvl 40: ${_calculateCpAtLevel(40)} CP',
-                                style: const TextStyle(
-                                  color: AppTheme.textSecond,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 6),
+                            child: Text(
+                              'IVs: $_atkIv / $_defIv / $_staIv (${((_atkIv + _defIv + _staIv) / 45 * 100).toStringAsFixed(1)}%)',
+                              style: const TextStyle(color: AppTheme.textSecond, fontSize: 11, fontWeight: FontWeight.w500),
                             ),
+                          ),
                         ],
                       ),
                     ),
+                    if (_showMega)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            // 👇 Botón toggle X/Y (solo para Charizard/Mewtwo)
+                            if (_hasDualMega) ...[
+                              _buildMegaToggleButton('X'),
+                              const SizedBox(width: 8),
+                              Container(
+                                width: 1,
+                                height: 24,
+                                color: AppTheme.borderColor,
+                              ),
+                              const SizedBox(width: 8),
+                              _buildMegaToggleButton('Y'),
+                            ] else
+                              // Badge simple para Mega única
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF00E5FF).withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color: const Color(0xFF00E5FF),
+                                    width: 1.5,
+                                  ),
+                                ),
+                                child: const Text(
+                                  '✨ MEGA',
+                                  style: TextStyle(
+                                    color: Color(0xFF00E5FF),
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
                     const SizedBox(height: 20),
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppTheme.bgSurface,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: primary.withOpacity(0.2)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Sliders de IVs
+                          _StatIvSlider(label: 'ATK', value: _atkIv, color: const Color(0xFFFF6B35), onChanged: (v) => setState(() => _atkIv = v)),
+                          _StatIvSlider(label: 'DEF', value: _defIv, color: const Color(0xFF2196F3), onChanged: (v) => setState(() => _defIv = v)),
+                          _StatIvSlider(label: 'STA', value: _staIv, color: const Color(0xFF4CAF50), onChanged: (v) => setState(() => _staIv = v)),
+                          
+                          const SizedBox(height: 8),
+                          
+                          // Selector de Nivel
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text('Nivel', style: TextStyle(color: AppTheme.textSecond, fontSize: 12, fontWeight: FontWeight.w600)),
+                              DropdownButton<int>(
+                                value: _selectedLevel,
+                                underline: const SizedBox(),
+                                icon: const Icon(Icons.arrow_drop_down, size: 18, color: AppTheme.textSecond),
+                                dropdownColor: AppTheme.bgCard,
+                                style: const TextStyle(color: AppTheme.textPrimary, fontSize: 12, fontWeight: FontWeight.w700),
+                                items: [50, 45, 40, 35, 30, 25, 20, 15].map((lvl) => DropdownMenuItem(value: lvl, child: Text('Nvl $lvl'))).toList(),
+                                onChanged: (v) { if (v != null) setState(() => _selectedLevel = v); },
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 10),
 
                     // ── Stats base ──
                     if (widget.pokemon.baseAttack != null) ...[
-                      _SectionTitle(title: 'Stats base'),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _SectionTitle(title: 'Stats base'),
+                          if (_showMega)
+                            Row(
+                              children: [
+                                Icon(Icons.bolt, color: const Color(0xFFFFD700), size: 14),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'Mega: +20%',
+                                  style: const TextStyle(
+                                    color: Color(0xFFFFD700),
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ),
+                        ],
+                      ),
                       const SizedBox(height: 10),
+                      
                       StatBar(
                         label: 'Ataque',
-                        value: widget.pokemon.baseAttack!,
+                        value: _getEffectiveStats()['atk']! + _atkIv,
                         maxValue: 350,
-                        color: const Color(0xFFFF6B35),
+                        color: _showMega ? const Color(0xFFFF9800) : const Color(0xFFFF6B35),
                       ),
                       StatBar(
                         label: 'Defensa',
-                        value: widget.pokemon.baseDefense!,
+                        value: _getEffectiveStats()['def']! + _defIv,
                         maxValue: 350,
-                        color: const Color(0xFF2196F3),
+                        color: _showMega ? const Color(0xFF4FC3F7) : const Color(0xFF2196F3),
                       ),
                       StatBar(
                         label: 'Stamina',
-                        value: widget.pokemon.baseStamina!,
+                        value: _getEffectiveStats()['sta']! + _staIv,
                         maxValue: 500,
-                        color: const Color(0xFF4CAF50),
+                        color: _showMega ? const Color(0xFF81C784) : const Color(0xFF4CAF50),
                       ),
                       const SizedBox(height: 20),
                     ],
@@ -553,99 +918,37 @@ class _ReleasedViewState extends State<_ReleasedView> {
                     Row(
                       children: [
                         if (widget.pokemon.buddyDistanceKm != null)
-                          Expanded(
-                            child: _InfoTile(
-                              icon: Icons.directions_walk,
-                              label: 'Buddy km',
-                              value: '${widget.pokemon.buddyDistanceKm} km',
-                              color: const Color(0xFF00B4FF),
-                            ),
-                          ),
-                        if (widget.pokemon.buddyDistanceKm != null &&
-                            widget.pokemon.candyToEvolve != null)
-                          const SizedBox(width: 12),
+                          Expanded(child: _InfoTile(icon: Icons.directions_walk, label: 'Buddy km', value: '${widget.pokemon.buddyDistanceKm} km', color: const Color(0xFF00B4FF))),
+                        if (widget.pokemon.buddyDistanceKm != null && widget.pokemon.candyToEvolve != null) const SizedBox(width: 12),
                         if (widget.pokemon.candyToEvolve != null)
-                          Expanded(
-                            child: _InfoTile(
-                              icon: Icons.fiber_manual_record,
-                              label: 'Candy evolución',
-                              value: '${widget.pokemon.candyToEvolve}',
-                              color: const Color(0xFFFF69B4),
-                            ),
-                          ),
+                          Expanded(child: _InfoTile(icon: Icons.fiber_manual_record, label: 'Candy evolución', value: '${widget.pokemon.candyToEvolve}', color: const Color(0xFFFF69B4))),
                       ],
                     ),
                     const SizedBox(height: 12),
                     if (widget.pokemon.raidLevel != null)
-                      _InfoTile(
-                        icon: Icons.shield,
-                        label: 'Nivel de Raid',
-                        value: 'Tier ${widget.pokemon.raidLevel}',
-                        color: const Color(0xFFFFD700),
-                        full: true,
-                      ),
+                      _InfoTile(icon: Icons.shield, label: 'Nivel de Raid', value: 'Tier ${widget.pokemon.raidLevel}', color: const Color(0xFFFFD700), full: true),
                     const SizedBox(height: 20),
 
                     // ── Movimientos ──
-                    if (widget.pokemon.fastMoves.isNotEmpty ||
-                        widget.pokemon.chargedMoves.isNotEmpty) ...[
+                    if (widget.pokemon.fastMoves.isNotEmpty || widget.pokemon.chargedMoves.isNotEmpty) ...[
                       _SectionTitle(title: 'Movimientos'),
                       const SizedBox(height: 10),
-
                       if (widget.pokemon.fastMoves.isNotEmpty) ...[
-                        const Text(
-                          'RÁPIDOS',
-                          style: TextStyle(
-                            color: AppTheme.textSecond,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 1.2,
-                          ),
-                        ),
+                        const Text('RÁPIDOS', style: TextStyle(color: AppTheme.textSecond, fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 1.2)),
                         const SizedBox(height: 6),
-                        Wrap(
-                          spacing: 6,
-                          runSpacing: 6,
-                          children: [
-                            ...widget.pokemon.fastMoves
-                                .map((m) => _MoveBadge(
-                                    name: m, color: const Color(0xFF00B4FF))),
-                            ...widget.pokemon.eliteFastMoves
-                                .map((m) => _MoveBadge(
-                                    name: m,
-                                    color: const Color(0xFFFFD700),
-                                    elite: true)),
-                          ],
-                        ),
+                        Wrap(spacing: 6, runSpacing: 6, children: [
+                          ...widget.pokemon.fastMoves.map((m) => _MoveBadge(name: m, color: const Color(0xFF00B4FF))),
+                          ...widget.pokemon.eliteFastMoves.map((m) => _MoveBadge(name: m, color: const Color(0xFFFFD700), elite: true)),
+                        ]),
                         const SizedBox(height: 12),
                       ],
-
                       if (widget.pokemon.chargedMoves.isNotEmpty) ...[
-                        const Text(
-                          'CARGADOS',
-                          style: TextStyle(
-                            color: AppTheme.textSecond,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 1.2,
-                          ),
-                        ),
+                        const Text('CARGADOS', style: TextStyle(color: AppTheme.textSecond, fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 1.2)),
                         const SizedBox(height: 6),
-                        Wrap(
-                          spacing: 6,
-                          runSpacing: 6,
-                          children: [
-                            ...widget.pokemon.chargedMoves
-                                .map((m) => _MoveBadge(
-                                    name: m,
-                                    color: const Color(0xFFFF6B35))),
-                            ...widget.pokemon.eliteChargedMoves
-                                .map((m) => _MoveBadge(
-                                    name: m,
-                                    color: const Color(0xFFA855F7),
-                                    elite: true)),
-                          ],
-                        ),
+                        Wrap(spacing: 6, runSpacing: 6, children: [
+                          ...widget.pokemon.chargedMoves.map((m) => _MoveBadge(name: m, color: const Color(0xFFFF6B35))),
+                          ...widget.pokemon.eliteChargedMoves.map((m) => _MoveBadge(name: m, color: const Color(0xFFA855F7), elite: true)),
+                        ]),
                         const SizedBox(height: 20),
                       ],
                     ],
@@ -654,15 +957,9 @@ class _ReleasedViewState extends State<_ReleasedView> {
                     if (widget.pokemon.evolutions.isNotEmpty) ...[
                       _SectionTitle(title: 'Evoluciones'),
                       const SizedBox(height: 10),
-                      ...widget.pokemon.evolutions.map(
-                        (evo) => _EvoTile(
-                          evo: evo,
-                          primaryColor: primary,
-                        ),
-                      ),
+                      ...widget.pokemon.evolutions.map((evo) => _EvoTile(evo: evo, primaryColor: primary)),
                       const SizedBox(height: 16),
                     ],
-
                     const SizedBox(height: 12),
                   ],
                 ),
@@ -673,30 +970,41 @@ class _ReleasedViewState extends State<_ReleasedView> {
       ),
     );
   }
-  void initState() {
-    super.initState();
-    print('=== DEBUG ${widget.pokemon.name} ===');
-    print('maxCp: ${widget.pokemon.maxCp}');
-    print('baseAttack: ${widget.pokemon.baseAttack}');
-    print('baseDefense: ${widget.pokemon.baseDefense}');
-    print('baseStamina: ${widget.pokemon.baseStamina}');
-    print('calculatedMaxCp: ${widget.pokemon.calculatedMaxCp}');
-    print('=============================');
+
+  // Widget auxiliar para los sliders de IVs
+  Widget _StatIvSlider({required String label, required int value, required Color color, required ValueChanged<int> onChanged}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2.0),
+      child: Row(
+        children: [
+          SizedBox(width: 40, child: Text(label, style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12))),
+          Expanded(
+            child: Slider(
+              value: value.toDouble(),
+              min: 0,
+              max: 15,
+              divisions: 15,
+              label: value.toString(),
+              activeColor: color,
+              inactiveColor: color.withOpacity(0.2),
+              onChanged: (v) => onChanged(v.round()),
+            ),
+          ),
+          Container(
+            width: 32,
+            alignment: Alignment.center,
+            child: Text('$value', style: TextStyle(color: color, fontWeight: FontWeight.w800, fontSize: 14)),
+          ),
+        ],
+      ),
+    );
   }
 
-  // Widget helper para placeholder
   Widget _buildPlaceholderImage(Color primary) {
     return Container(
       height: 210,
-      decoration: BoxDecoration(
-        color: primary.withOpacity(0.1),
-        shape: BoxShape.circle,
-      ),
-      child: Icon(
-        Icons.catching_pokemon,
-        color: primary.withOpacity(0.3),
-        size: 48,
-      ),
+      decoration: BoxDecoration(color: primary.withOpacity(0.1), shape: BoxShape.circle),
+      child: Icon(Icons.catching_pokemon, color: primary.withOpacity(0.3), size: 48),
     );
   }
 }
@@ -783,7 +1091,11 @@ class _MoveBadge extends StatelessWidget {
   final Color color;
   final bool elite;
 
-  const _MoveBadge({required this.name, required this.color, this.elite = false});
+  const _MoveBadge({
+    required this.name,
+    required this.color,
+    this.elite = false,
+  });
 
   @override
   Widget build(BuildContext context) => Container(
@@ -824,13 +1136,13 @@ class _EvoTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final name   = evo['pokemon_name'] ?? '';
-    final candy  = evo['candy_required'];
-    final item   = evo['item_required'];
-    final lure   = evo['lure_required'];
-    final day    = evo['only_evolves_in_daytime'] == true;
-    final night  = evo['only_evolves_in_nighttime'] == true;
-    final buddy  = evo['must_be_buddy_to_evolve'] == true;
+    final name = evo['pokemon_name'] ?? '';
+    final candy = evo['candy_required'];
+    final item = evo['item_required'];
+    final lure = evo['lure_required'];
+    final day = evo['only_evolves_in_daytime'] == true;
+    final night = evo['only_evolves_in_nighttime'] == true;
+    final buddy = evo['must_be_buddy_to_evolve'] == true;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -838,8 +1150,7 @@ class _EvoTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.bgSurface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-            color: primaryColor.withOpacity(0.2), width: 1),
+        border: Border.all(color: primaryColor.withOpacity(0.2), width: 1),
       ),
       child: Row(
         children: [
@@ -860,16 +1171,11 @@ class _EvoTile extends StatelessWidget {
             children: [
               if (candy != null)
                 _EvoTag('$candy candy', const Color(0xFFFF69B4)),
-              if (item != null)
-                _EvoTag(item, const Color(0xFFFFD700)),
-              if (lure != null)
-                _EvoTag(lure, const Color(0xFF4CAF50)),
-              if (day)
-                _EvoTag('Día', const Color(0xFFFFB300)),
-              if (night)
-                _EvoTag('Noche', const Color(0xFF7C4DFF)),
-              if (buddy)
-                _EvoTag('Buddy', const Color(0xFF00BCD4)),
+              if (item != null) _EvoTag(item, const Color(0xFFFFD700)),
+              if (lure != null) _EvoTag(lure, const Color(0xFF4CAF50)),
+              if (day) _EvoTag('Día', const Color(0xFFFFB300)),
+              if (night) _EvoTag('Noche', const Color(0xFF7C4DFF)),
+              if (buddy) _EvoTag('Buddy', const Color(0xFF00BCD4)),
             ],
           ),
         ],
@@ -892,11 +1198,7 @@ class _EvoTag extends StatelessWidget {
     ),
     child: Text(
       text,
-      style: TextStyle(
-        color: color,
-        fontSize: 10,
-        fontWeight: FontWeight.w700,
-      ),
+      style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.w700),
     ),
   );
 }
@@ -908,40 +1210,53 @@ class _BadgesRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final badges = <_Badge>[];
-    if (pokemon.isShiny)    badges.add(_Badge('✨ Shiny', const Color(0xFFFFD700)));
-    if (pokemon.isNesting)  badges.add(_Badge('🌿 Nesting', const Color(0xFF4CAF50)));
-    if (pokemon.isShadow)   badges.add(_Badge('🌑 Shadow', const Color(0xFF7C4DFF)));
-    if (pokemon.isAlolan)   badges.add(_Badge('🌺 Alolan', const Color(0xFFFF6B9D)));
-    if (pokemon.isGalarian) badges.add(_Badge('⚙️ Galarian', const Color(0xFF78909C)));
-    if (pokemon.isBaby)     badges.add(_Badge('🍼 Baby', const Color(0xFFFF9800)));
-    if (pokemon.isPvpExclusive)  badges.add(_Badge('⚔️ PVP Exclusivo', const Color(0xFFE040FB)));
-    if (pokemon.isRaidExclusive) badges.add(_Badge('🏅 Raid Exclusivo', const Color(0xFFFFD700)));
+    if (pokemon.isShiny) badges.add(_Badge('✨ Shiny', const Color(0xFFFFD700)));
+    if (pokemon.isNesting)
+      badges.add(_Badge('🌿 Nesting', const Color(0xFF4CAF50)));
+    if (pokemon.isShadow)
+      badges.add(_Badge('🌑 Shadow', const Color(0xFF7C4DFF)));
+    if (pokemon.isAlolan)
+      badges.add(_Badge('🌺 Alolan', const Color(0xFFFF6B9D)));
+    if (pokemon.isGalarian)
+      badges.add(_Badge('⚙️ Galarian', const Color(0xFF78909C)));
+    if (pokemon.isBaby) badges.add(_Badge('🍼 Baby', const Color(0xFFFF9800)));
+    if (pokemon.isPvpExclusive)
+      badges.add(_Badge('⚔️ PVP Exclusivo', const Color(0xFFE040FB)));
+    if (pokemon.isRaidExclusive)
+      badges.add(_Badge('🏅 Raid Exclusivo', const Color(0xFFFFD700)));
 
     if (badges.isEmpty) return const SizedBox.shrink();
 
     return Wrap(
       spacing: 7,
       runSpacing: 7,
-      children: badges
-          .map((b) => Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 12, vertical: 5),
-                decoration: BoxDecoration(
-                  color: b.color.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                      color: b.color.withOpacity(0.4), width: 1),
-                ),
-                child: Text(
-                  b.label,
-                  style: TextStyle(
-                    color: b.color,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
+      children:
+          badges
+              .map(
+                (b) => Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: b.color.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: b.color.withOpacity(0.4),
+                      width: 1,
+                    ),
+                  ),
+                  child: Text(
+                    b.label,
+                    style: TextStyle(
+                      color: b.color,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
-              ))
-          .toList(),
+              )
+              .toList(),
     );
   }
 }

@@ -57,14 +57,18 @@ class PogoApiService {
 
   // Carga un Map con caché
   static Future<Map<String, dynamic>> _cachedMap(
-      String ep, Map<String, dynamic>? cache) async {
+    String ep,
+    Map<String, dynamic>? cache,
+  ) async {
     if (cache != null) return cache;
     return _getMap(ep);
   }
 
   // Carga un List con caché
   static Future<List<dynamic>> _cachedList(
-      String ep, List<dynamic>? cache) async {
+    String ep,
+    List<dynamic>? cache,
+  ) async {
     if (cache != null) return cache;
     return _getList(ep);
   }
@@ -106,32 +110,33 @@ class PogoApiService {
     ]);
 
     // Guardar en caché
-    _names      = maps[0];
-    _shiny      = maps[1];
-    _released   = maps[2];
-    _nesting    = maps[3];
-    _shadow     = maps[4];
-    _alolan     = maps[5];
-    _galarian   = maps[6];
-    _rarity     = maps[7];
-    _buddyDist  = maps[8];
+    _names = maps[0];
+    _shiny = maps[1];
+    _released = maps[2];
+    _nesting = maps[3];
+    _shadow = maps[4];
+    _alolan = maps[5];
+    _galarian = maps[6];
+    _rarity = maps[7];
+    _buddyDist = maps[8];
     _candyEvolve = maps[9];
     _generations = maps[10];
     _raidExclusive = maps[11];
 
-    _stats       = lists[0];
-    _maxCp       = lists[1];
-    _types       = lists[2];
-    _moves       = lists[3];
-    _hwScale     = lists[4];
-    _evolutions  = lists[5];
-    _pvpExclusive  = lists[6];
-    _baby          = lists[7];
+    _stats = lists[0];
+    _maxCp = lists[1];
+    _types = lists[2];
+    _moves = lists[3];
+    _hwScale = lists[4];
+    _evolutions = lists[5];
+    _pvpExclusive = lists[6];
+    _baby = lists[7];
 
     // ── Mapas de acceso rápido por ID ──final statsByName = <String, Map<String, dynamic>>{};
     final statsByName = <String, Map<String, dynamic>>{};
     for (final s in _stats!) {
-      final name = (s['pokemon_name'] ?? s['name'] ?? '').toString().toLowerCase();
+      final name =
+          (s['pokemon_name'] ?? s['name'] ?? '').toString().toLowerCase();
       if (name.isNotEmpty) {
         statsByName[name] = Map<String, dynamic>.from(s as Map);
       }
@@ -165,10 +170,12 @@ class PogoApiService {
 
     final legendaryIds = <String>{};
     final mythicIds = <String>{};
-    (_rarity!['Legendary'] as List? ?? [])
-        .forEach((p) => legendaryIds.add(p['pokemon_id'].toString()));
-    (_rarity!['Mythic'] as List? ?? [])
-        .forEach((p) => mythicIds.add(p['pokemon_id'].toString()));
+    (_rarity!['Legendary'] as List? ?? []).forEach(
+      (p) => legendaryIds.add(p['pokemon_id'].toString()),
+    );
+    (_rarity!['Mythic'] as List? ?? []).forEach(
+      (p) => mythicIds.add(p['pokemon_id'].toString()),
+    );
 
     final buddyById = <String, int>{};
     _buddyDist!.forEach((dist, list) {
@@ -191,9 +198,7 @@ class PogoApiService {
       }
     });
 
-    final pvpIds = <String>{
-      ..._pvpExclusive!.map((p) => p['id'].toString())
-    };
+    final pvpIds = <String>{..._pvpExclusive!.map((p) => p['id'].toString())};
 
     final raidMap = <String, dynamic>{};
     _raidExclusive!.forEach((key, value) {
@@ -206,17 +211,17 @@ class PogoApiService {
     final result = <Pokemon>[];
 
     _names!.forEach((_, data) {
-      final id  = data['id'] as int;
+      final id = data['id'] as int;
       final sid = id.toString();
 
       final pokemonName = data['name']?.toString().toLowerCase() ?? '';
       final stats = statsByName[pokemonName];
       final maxCpEntry = maxCpById[id];
-      final hw    = hwById[sid];
+      final hw = hwById[sid];
       final moves = movesById[sid];
-      final evos  = evoById[sid] ?? [];
+      final evos = evoById[sid] ?? [];
 
-/*
+      /*
       developer.log(
         'Pokemon $pokemonName (ID: $id) - Stats: ${stats != null ? "FOUND" : "NOT FOUND"}',
         name: 'PogoApiService',
@@ -228,38 +233,50 @@ class PogoApiService {
         );
       }
 */
-      result.add(Pokemon(
-        id:   id,
-        name: data['name'] as String,
-        types: typesById[sid] ?? ['Normal'],
-        maxCp:       maxCpEntry,
-        baseAttack:  stats != null ? _toInt(stats['base_attack']) : null,
-        baseDefense: stats != null ? _toInt(stats['base_defense']) : null,
-        baseStamina: stats != null ? _toInt(stats['base_stamina']) : null,
-        isShiny:    _shiny!.containsKey(sid) || _shiny!.containsKey(id),
-        isReleased: _released!.containsKey(sid) || _released!.containsKey(id),
-        isNesting:  _nesting!.containsKey(sid) || _nesting!.containsKey(id),
-        isShadow:   _shadow!.containsKey(sid) || _shadow!.containsKey(id),
-        isAlolan:   _alolan!.containsKey(sid) || _alolan!.containsKey(id),
-        isGalarian: _galarian!.containsKey(sid) || _galarian!.containsKey(id),
-        isLegendary:     legendaryIds.contains(sid),
-        isMythic:        mythicIds.contains(sid),
-        isPvpExclusive:  pvpIds.contains(sid),
-        isRaidExclusive: raidMap.containsKey(sid),
-        isBaby:          babyIds.contains(sid),
-        buddyDistanceKm: buddyById[sid],
-        candyToEvolve:   candyById[sid],
-        pokedexHeightM:  (hw?['pokedex_height'] as num?)?.toDouble(),
-        pokedexWeightKg: (hw?['pokedex_weight'] as num?)?.toDouble(),
-        fastMoves:    moves != null ? List<String>.from(moves['fast_moves'] ?? []) : [],
-        chargedMoves: moves != null ? List<String>.from(moves['charged_moves'] ?? []) : [],
-        eliteFastMoves:    moves != null ? List<String>.from(moves['elite_fast_moves'] ?? []) : [],
-        eliteChargedMoves: moves != null ? List<String>.from(moves['elite_charged_moves'] ?? []) : [],
-        evolutions: evos,
-        generation: genById[sid],
-        raidLevel:  raidMap[sid]?['raid_level'] as int?,
-        possibleShiny: _shiny!.containsKey(sid),
-      ));
+      result.add(
+        Pokemon(
+          id: id,
+          name: data['name'] as String,
+          types: typesById[sid] ?? ['Normal'],
+          maxCp: maxCpEntry,
+          baseAttack: stats != null ? _toInt(stats['base_attack']) : null,
+          baseDefense: stats != null ? _toInt(stats['base_defense']) : null,
+          baseStamina: stats != null ? _toInt(stats['base_stamina']) : null,
+          isShiny: _shiny!.containsKey(sid) || _shiny!.containsKey(id),
+          isReleased: _released!.containsKey(sid) || _released!.containsKey(id),
+          isNesting: _nesting!.containsKey(sid) || _nesting!.containsKey(id),
+          isShadow: _shadow!.containsKey(sid) || _shadow!.containsKey(id),
+          isAlolan: _alolan!.containsKey(sid) || _alolan!.containsKey(id),
+          isGalarian: _galarian!.containsKey(sid) || _galarian!.containsKey(id),
+          isLegendary: legendaryIds.contains(sid),
+          isMythic: mythicIds.contains(sid),
+          isPvpExclusive: pvpIds.contains(sid),
+          isRaidExclusive: raidMap.containsKey(sid),
+          isBaby: babyIds.contains(sid),
+          buddyDistanceKm: buddyById[sid],
+          candyToEvolve: candyById[sid],
+          pokedexHeightM: (hw?['pokedex_height'] as num?)?.toDouble(),
+          pokedexWeightKg: (hw?['pokedex_weight'] as num?)?.toDouble(),
+          fastMoves:
+              moves != null ? List<String>.from(moves['fast_moves'] ?? []) : [],
+          chargedMoves:
+              moves != null
+                  ? List<String>.from(moves['charged_moves'] ?? [])
+                  : [],
+          eliteFastMoves:
+              moves != null
+                  ? List<String>.from(moves['elite_fast_moves'] ?? [])
+                  : [],
+          eliteChargedMoves:
+              moves != null
+                  ? List<String>.from(moves['elite_charged_moves'] ?? [])
+                  : [],
+          evolutions: evos,
+          generation: genById[sid],
+          raidLevel: raidMap[sid]?['raid_level'] as int?,
+          possibleShiny: _shiny!.containsKey(sid),
+        ),
+      );
     });
 
     result.sort((a, b) => a.id.compareTo(b.id));

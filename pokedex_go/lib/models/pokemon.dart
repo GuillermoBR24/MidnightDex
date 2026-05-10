@@ -1,4 +1,6 @@
+// lib/models/pokemon.dart
 import 'dart:math';
+import 'iv_config.dart';
 
 class Pokemon {
   final int id;
@@ -70,7 +72,7 @@ class Pokemon {
 
   String get shinyImageUrl =>
       'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/shiny/$id.png';
-      
+
   String get shinyImageUrlFallback =>
       'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/$id.png';
 
@@ -82,56 +84,53 @@ class Pokemon {
     return 'Standard';
   }
 
-  int get calculatedMaxCp {
+  int calculateMaxCpWithIvs(IvConfig ivs, {int level = 50}) {
     if (baseAttack == null || baseDefense == null || baseStamina == null) {
-      return maxCp ?? 0; 
+      return maxCp ?? 0;
     }
-    
-    // Si la API ya trae un maxCp válido, úsalo como referencia
-    final apiCp = maxCp;
-    
-    // 👇 CPM para nivel 50 (máximo en Pokémon GO)
-    const cpm = 0.84029999;
-    
-    // 👇 Stats con IVs máximos (100% perfect)
-    final attack = baseAttack! + 15;   // +15 IV Attack
-    final defense = baseDefense! + 15; // +15 IV Defense  
-    final stamina = baseStamina! + 15; // +15 IV Stamina
-    
+
+    final cpm = getCpmForLevel(level);
+    final attack = baseAttack! + ivs.attack;
+    final defense = baseDefense! + ivs.defense;
+    final stamina = baseStamina! + ivs.stamina;
+
     if (attack <= 0 || defense <= 0 || stamina <= 0) return 0;
-    
-    // Fórmula oficial de Pokémon GO
-    final cp = (attack * 
-               sqrt(defense.toDouble()) * 
-               sqrt(stamina.toDouble()) * 
-               cpm * cpm) / 10;
-    
-    final calculatedValue = cp.floor();
-    final finalValue = calculatedValue < 10 ? 10 : calculatedValue;
-    
-    // Retorna el mayor entre el calculado y el de API (por seguridad)
-    return apiCp != null && apiCp > finalValue ? apiCp : finalValue;
+
+    final cp =
+        (attack *
+            sqrt(defense.toDouble()) *
+            sqrt(stamina.toDouble()) *
+            cpm *
+            cpm) /
+        10;
+
+    final value = cp.floor();
+    return value < 10 ? 10 : value;
   }
 
-  int calculateCpWithIvs({
-    required int attackIv,   // 0-15
-    required int defenseIv,  // 0-15
-    required int staminaIv,  // 0-15
-    double cpm = 0.84029999, // Nivel 50 por defecto
-  }) {
-    if (baseAttack == null || baseDefense == null || baseStamina == null) {
-      return 0;
-    }
-    
-    final attack = baseAttack! + attackIv.clamp(0, 15);
-    final defense = baseDefense! + defenseIv.clamp(0, 15);
-    final stamina = baseStamina! + staminaIv.clamp(0, 15);
-    
-    final cp = (attack * 
-              sqrt(defense.toDouble()) * 
-              sqrt(stamina.toDouble()) * 
-              cpm * cpm) / 10;
-    
-    return cp.floor().clamp(10, 9999);
+  static double getCpmForLevel(int level) {
+    const cpmTable = {
+      1: 0.09400001,
+      10: 0.42250000,
+      15: 0.51739395,
+      20: 0.59740001,
+      25: 0.66793400,
+      30: 0.73170000,
+      35: 0.79030001,
+      40: 0.79030001,
+      41: 0.79530001,
+      42: 0.80030000,
+      43: 0.80530000,
+      44: 0.81030000,
+      45: 0.81530000,
+      46: 0.82030000,
+      47: 0.82530000,
+      48: 0.83030000,
+      49: 0.83530000,
+      50: 0.84029999,
+    };
+    return cpmTable[level] ?? 0.84029999;
   }
+
+  int get calculatedMaxCp => calculateMaxCpWithIvs(IvConfig.perfect);
 }

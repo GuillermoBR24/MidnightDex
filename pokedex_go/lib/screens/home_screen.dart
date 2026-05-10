@@ -14,10 +14,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
 
-  static const List<Widget> _screens = [
-    PokedexScreen(),
-    TierScreen(),
-  ];
+  static const List<Widget> _screens = [PokedexScreen(), TierScreen()];
 
   @override
   Widget build(BuildContext context) {
@@ -28,19 +25,24 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Row(
           children: [
             Container(
-              width: 30, height: 30,
+              width: 30,
+              height: 30,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(color: AppTheme.accentBlue, width: 2),
               ),
-              child: const Icon(Icons.catching_pokemon,
-                  color: AppTheme.accentBlue, size: 18),
+              child: const Icon(
+                Icons.catching_pokemon,
+                color: AppTheme.accentBlue,
+                size: 18,
+              ),
             ),
             const SizedBox(width: 10),
             ShaderMask(
-              shaderCallback: (bounds) => const LinearGradient(
-                colors: [AppTheme.accentBlue, AppTheme.accentCyan],
-              ).createShader(bounds),
+              shaderCallback:
+                  (bounds) => const LinearGradient(
+                    colors: [AppTheme.accentBlue, AppTheme.accentCyan],
+                  ).createShader(bounds),
               child: const Text(
                 'POKÉDEX GO',
                 style: TextStyle(
@@ -60,20 +62,23 @@ class _HomeScreenState extends State<HomeScreen> {
               label: Text(
                 _currentIndex == 0 ? 'PoGoAPI' : 'TIER LIST',
                 style: TextStyle(
-                  color: _currentIndex == 0
-                      ? AppTheme.accentCyan
-                      : const Color(0xFFFFD700),
+                  color:
+                      _currentIndex == 0
+                          ? AppTheme.accentCyan
+                          : const Color(0xFFFFD700),
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              backgroundColor: _currentIndex == 0
-                  ? AppTheme.accentCyan.withOpacity(0.1)
-                  : const Color(0xFFFFD700).withOpacity(0.1),
+              backgroundColor:
+                  _currentIndex == 0
+                      ? AppTheme.accentCyan.withOpacity(0.1)
+                      : const Color(0xFFFFD700).withOpacity(0.1),
               side: BorderSide(
-                color: _currentIndex == 0
-                    ? AppTheme.accentCyan.withOpacity(0.4)
-                    : const Color(0xFFFFD700).withOpacity(0.4),
+                color:
+                    _currentIndex == 0
+                        ? AppTheme.accentCyan.withOpacity(0.4)
+                        : const Color(0xFFFFD700).withOpacity(0.4),
               ),
               padding: EdgeInsets.zero,
             ),
@@ -81,10 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
 
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
-      ),
+      body: IndexedStack(index: _currentIndex, children: _screens),
 
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
@@ -101,7 +103,9 @@ class _HomeScreenState extends State<HomeScreen> {
           selectedItemColor: AppTheme.accentBlue,
           unselectedItemColor: AppTheme.textSecond,
           selectedLabelStyle: const TextStyle(
-            fontSize: 11, fontWeight: FontWeight.w700),
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+          ),
           unselectedLabelStyle: const TextStyle(fontSize: 11),
           items: const [
             BottomNavigationBarItem(

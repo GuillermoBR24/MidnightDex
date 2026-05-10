@@ -13,7 +13,7 @@ class TypeBadge extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: small ? 8 : 12,
-        vertical:   small ? 3 : 5,
+        vertical: small ? 3 : 5,
       ),
       decoration: BoxDecoration(
         color: color.withOpacity(0.2),

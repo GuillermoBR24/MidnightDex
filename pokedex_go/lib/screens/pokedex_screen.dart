@@ -14,16 +14,32 @@ class PokedexScreen extends StatefulWidget {
 
 class _PokedexScreenState extends State<PokedexScreen> {
   List<Pokemon> _allPokemon = [];
-  List<Pokemon> _filtered  = [];
+  List<Pokemon> _filtered = [];
   bool _loading = true;
   String _error = '';
   final TextEditingController _search = TextEditingController();
   String _filterType = 'All';
 
   static const List<String> _types = [
-    'All','Normal','Fire','Water','Electric','Grass','Ice',
-    'Fighting','Poison','Ground','Flying','Psychic','Bug',
-    'Rock','Ghost','Dragon','Dark','Steel','Fairy',
+    'All',
+    'Normal',
+    'Fire',
+    'Water',
+    'Electric',
+    'Grass',
+    'Ice',
+    'Fighting',
+    'Poison',
+    'Ground',
+    'Flying',
+    'Psychic',
+    'Bug',
+    'Rock',
+    'Ghost',
+    'Dragon',
+    'Dark',
+    'Steel',
+    'Fairy',
   ];
 
   @override
@@ -44,12 +60,12 @@ class _PokedexScreenState extends State<PokedexScreen> {
       final list = await PogoApiService.fetchAllPokemon();
       setState(() {
         _allPokemon = list;
-        _filtered   = list;
-        _loading    = false;
+        _filtered = list;
+        _loading = false;
       });
     } catch (e) {
       setState(() {
-        _error   = e.toString();
+        _error = e.toString();
         _loading = false;
       });
     }
@@ -58,13 +74,14 @@ class _PokedexScreenState extends State<PokedexScreen> {
   void _applyFilter() {
     final q = _search.text.toLowerCase();
     setState(() {
-      _filtered = _allPokemon.where((p) {
-        final matchName = p.name.toLowerCase().contains(q) ||
-            p.id.toString().contains(q);
-        final matchType = _filterType == 'All' ||
-            p.types.contains(_filterType);
-        return matchName && matchType;
-      }).toList();
+      _filtered =
+          _allPokemon.where((p) {
+            final matchName =
+                p.name.toLowerCase().contains(q) || p.id.toString().contains(q);
+            final matchType =
+                _filterType == 'All' || p.types.contains(_filterType);
+            return matchName && matchType;
+          }).toList();
     });
   }
 
@@ -90,17 +107,31 @@ class _PokedexScreenState extends State<PokedexScreen> {
               hintText: 'Buscar Pokémon...',
               hintStyle: const TextStyle(color: AppTheme.textSecond),
               prefixIcon: const Icon(Icons.search, color: AppTheme.accentBlue),
+              
+              // 👇 Botón X para borrar (solo visible cuando hay texto)
+              suffixIcon:
+                  _search.text.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear, color: AppTheme.textSecond, size: 20),
+                          onPressed: () {
+                            _search.clear();  // 👈 Borra el texto
+                            _applyFilter();   // 👈 Aplica el filtro para mostrar todos
+                          },
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                        )
+                      : null,
+              
               filled: true,
               fillColor: AppTheme.bgSurface,
-              contentPadding: const EdgeInsets.symmetric(vertical: 0),
+              contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
                 borderSide: BorderSide.none,
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
-                borderSide: const BorderSide(
-                    color: AppTheme.accentBlue, width: 1.5),
+                borderSide: const BorderSide(color: AppTheme.accentBlue, width: 1.5),
               ),
             ),
           ),
@@ -113,10 +144,11 @@ class _PokedexScreenState extends State<PokedexScreen> {
             scrollDirection: Axis.horizontal,
             itemCount: _types.length,
             itemBuilder: (_, i) {
-              final type  = _types[i];
-              final color = type == 'All'
-                  ? AppTheme.accentBlue
-                  : AppTheme.getTypeColor(type);
+              final type = _types[i];
+              final color =
+                  type == 'All'
+                      ? AppTheme.accentBlue
+                      : AppTheme.getTypeColor(type);
               final selected = _filterType == type;
               return GestureDetector(
                 onTap: () => _setType(type),
@@ -124,16 +156,15 @@ class _PokedexScreenState extends State<PokedexScreen> {
                   duration: const Duration(milliseconds: 200),
                   margin: const EdgeInsets.only(right: 6),
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 14, vertical: 4),
+                    horizontal: 14,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
-                    color: selected
-                        ? color.withOpacity(0.25)
-                        : AppTheme.bgSurface,
+                    color:
+                        selected ? color.withOpacity(0.25) : AppTheme.bgSurface,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: selected
-                          ? color
-                          : AppTheme.borderColor,
+                      color: selected ? color : AppTheme.borderColor,
                       width: 1.2,
                     ),
                   ),
@@ -142,9 +173,7 @@ class _PokedexScreenState extends State<PokedexScreen> {
                     style: TextStyle(
                       color: selected ? color : AppTheme.textSecond,
                       fontSize: 12,
-                      fontWeight: selected
-                          ? FontWeight.w700
-                          : FontWeight.w500,
+                      fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
                     ),
                   ),
                 ),
@@ -179,13 +208,13 @@ class _PokedexScreenState extends State<PokedexScreen> {
               mainAxisSpacing: 8,
             ),
             itemCount: _filtered.length,
-            addAutomaticKeepAlives: true,  // 👈 Mantiene el estado
-            addRepaintBoundaries: true,     // 👈 Optimiza renderizado
+            addAutomaticKeepAlives: true, // 👈 Mantiene el estado
+            addRepaintBoundaries: true, // 👈 Optimiza renderizado
             itemBuilder: (context, index) {
               // 👇 Calcula el ancho disponible para 3 columnas
               final screenWidth = MediaQuery.of(context).size.width;
               final padding = 16.0; // 8px left + 8px right
-              final spacing = 8.0;  // crossAxisSpacing
+              final spacing = 8.0; // crossAxisSpacing
               final cellWidth = (screenWidth - padding - (2 * spacing)) / 3;
               final cellHeight = cellWidth / 0.75; // childAspectRatio
 
@@ -194,14 +223,16 @@ class _PokedexScreenState extends State<PokedexScreen> {
                 height: cellHeight,
                 child: PokemonCard(
                   pokemon: _filtered[index],
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => PokemonDetailScreen(
-                        pokemon: _filtered[index],
+                  onTap:
+                      () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (_) => PokemonDetailScreen(
+                                pokemon: _filtered[index],
+                              ),
+                        ),
                       ),
-                    ),
-                  ),
                 ),
               );
             },
@@ -242,16 +273,16 @@ class _PokedexScreenState extends State<PokedexScreen> {
           child: Text(
             _error,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: AppTheme.textSecond,
-              fontSize: 11,
-            ),
+            style: const TextStyle(color: AppTheme.textSecond, fontSize: 11),
           ),
         ),
         const SizedBox(height: 16),
         ElevatedButton.icon(
           onPressed: () {
-            setState(() { _loading = true; _error = ''; });
+            setState(() {
+              _loading = true;
+              _error = '';
+            });
             _load();
           },
           icon: const Icon(Icons.refresh),

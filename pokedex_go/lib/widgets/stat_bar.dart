@@ -51,10 +51,7 @@ class StatBar extends StatelessWidget {
               borderRadius: BorderRadius.circular(4),
               child: Stack(
                 children: [
-                  Container(
-                    height: 6,
-                    color: AppTheme.bgSurface,
-                  ),
+                  Container(height: 6, color: AppTheme.bgSurface),
                   FractionallySizedBox(
                     widthFactor: ratio,
                     child: Container(
@@ -67,7 +64,8 @@ class StatBar extends StatelessWidget {
                       ),
                     ),
                   ).animate().scaleX(
-                    begin: 0, end: 1,
+                    begin: 0,
+                    end: 1,
                     duration: 800.ms,
                     curve: Curves.easeOutCubic,
                     alignment: Alignment.centerLeft,

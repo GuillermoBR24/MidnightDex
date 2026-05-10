@@ -23,9 +23,23 @@ class _TierScreenState extends State<TierScreen>
   String _selectedType = 'Fire';
 
   static const List<String> _types = [
-    'Fire','Water','Grass','Electric','Ice','Fighting',
-    'Poison','Ground','Flying','Psychic','Bug','Rock',
-    'Ghost','Dragon','Dark','Steel','Fairy',
+    'Fire',
+    'Water',
+    'Grass',
+    'Electric',
+    'Ice',
+    'Fighting',
+    'Poison',
+    'Ground',
+    'Flying',
+    'Psychic',
+    'Bug',
+    'Rock',
+    'Ghost',
+    'Dragon',
+    'Dark',
+    'Steel',
+    'Fairy',
   ];
 
   @override
@@ -45,12 +59,15 @@ class _TierScreenState extends State<TierScreen>
     try {
       final (byType, megas) = await TierService.fetchTierData();
       setState(() {
-        _byType  = byType;
-        _megas   = megas;
+        _byType = byType;
+        _megas = megas;
         _loading = false;
       });
     } catch (e) {
-      setState(() { _error = e.toString(); _loading = false; });
+      setState(() {
+        _error = e.toString();
+        _loading = false;
+      });
     }
   }
 
@@ -71,7 +88,9 @@ class _TierScreenState extends State<TierScreen>
             indicatorColor: AppTheme.accentBlue,
             indicatorWeight: 2,
             labelStyle: const TextStyle(
-                fontSize: 13, fontWeight: FontWeight.w700),
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+            ),
             tabs: const [
               Tab(text: 'TOP 10 POR TIPO'),
               Tab(text: 'MEJORES MEGAS'),
@@ -82,9 +101,12 @@ class _TierScreenState extends State<TierScreen>
           child: TabBarView(
             controller: _tabs,
             children: [
-              _TypeTab(byType: _byType, types: _types,
+              _TypeTab(
+                byType: _byType,
+                types: _types,
                 selectedType: _selectedType,
-                onTypeSelected: (t) => setState(() => _selectedType = t)),
+                onTypeSelected: (t) => setState(() => _selectedType = t),
+              ),
               _MegaTab(megas: _megas),
             ],
           ),
@@ -99,8 +121,10 @@ class _TierScreenState extends State<TierScreen>
       children: [
         CircularProgressIndicator(color: AppTheme.accentBlue),
         SizedBox(height: 16),
-        Text('Calculando tier list...',
-            style: TextStyle(color: AppTheme.textSecond)),
+        Text(
+          'Calculando tier list...',
+          style: TextStyle(color: AppTheme.textSecond),
+        ),
       ],
     ),
   );
@@ -111,16 +135,26 @@ class _TierScreenState extends State<TierScreen>
       children: [
         const Icon(Icons.error_outline, color: AppTheme.textSecond, size: 48),
         const SizedBox(height: 12),
-        Text(_error,
-            textAlign: TextAlign.center,
-            style: const TextStyle(color: AppTheme.textSecond, fontSize: 12)),
+        Text(
+          _error,
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: AppTheme.textSecond, fontSize: 12),
+        ),
         const SizedBox(height: 16),
         ElevatedButton.icon(
-          onPressed: () { setState(() { _loading = true; _error = ''; }); _load(); },
+          onPressed: () {
+            setState(() {
+              _loading = true;
+              _error = '';
+            });
+            _load();
+          },
           icon: const Icon(Icons.refresh),
           label: const Text('Reintentar'),
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppTheme.accentBlue, foregroundColor: Colors.white),
+            backgroundColor: AppTheme.accentBlue,
+            foregroundColor: Colors.white,
+          ),
         ),
       ],
     ),
@@ -137,8 +171,10 @@ class _TypeTab extends StatelessWidget {
   final ValueChanged<String> onTypeSelected;
 
   const _TypeTab({
-    required this.byType, required this.types,
-    required this.selectedType, required this.onTypeSelected,
+    required this.byType,
+    required this.types,
+    required this.selectedType,
+    required this.onTypeSelected,
   });
 
   @override
@@ -155,15 +191,18 @@ class _TypeTab extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             itemCount: types.length,
             itemBuilder: (_, i) {
-              final type  = types[i];
+              final type = types[i];
               final color = AppTheme.getTypeColor(type);
-              final sel   = selectedType == type;
+              final sel = selectedType == type;
               return GestureDetector(
                 onTap: () => onTypeSelected(type),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 180),
                   margin: const EdgeInsets.only(right: 6),
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 5,
+                  ),
                   decoration: BoxDecoration(
                     color: sel ? color.withOpacity(0.25) : AppTheme.bgSurface,
                     borderRadius: BorderRadius.circular(20),
@@ -172,7 +211,8 @@ class _TypeTab extends StatelessWidget {
                       width: sel ? 1.5 : 1,
                     ),
                   ),
-                  child: Text(type,
+                  child: Text(
+                    type,
                     style: TextStyle(
                       color: sel ? color : AppTheme.textSecond,
                       fontSize: 12,
@@ -214,17 +254,23 @@ class _TypeTab extends StatelessWidget {
 
         // Lista
         Expanded(
-          child: list.isEmpty
-              ? const Center(
-                  child: Text('Sin datos para este tipo',
-                    style: TextStyle(color: AppTheme.textSecond)))
-              : ListView.builder(
-                  padding: const EdgeInsets.fromLTRB(12, 0, 12, 20),
-                  itemCount: list.length,
-                  itemBuilder: (_, i) => _TierCard(entry: list[i], rank: i + 1)
-                      .animate().fadeIn(delay: (i * 40).ms, duration: 300.ms)
-                      .slideX(begin: 0.05),
-                ),
+          child:
+              list.isEmpty
+                  ? const Center(
+                    child: Text(
+                      'Sin datos para este tipo',
+                      style: TextStyle(color: AppTheme.textSecond),
+                    ),
+                  )
+                  : ListView.builder(
+                    padding: const EdgeInsets.fromLTRB(12, 0, 12, 20),
+                    itemCount: list.length,
+                    itemBuilder:
+                        (_, i) => _TierCard(entry: list[i], rank: i + 1)
+                            .animate()
+                            .fadeIn(delay: (i * 40).ms, duration: 300.ms)
+                            .slideX(begin: 0.05),
+                  ),
         ),
       ],
     );
@@ -246,8 +292,11 @@ class _MegaTab extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
           child: Row(
             children: [
-              const Icon(Icons.auto_awesome,
-                  color: AppTheme.accentCyan, size: 14),
+              const Icon(
+                Icons.auto_awesome,
+                color: AppTheme.accentCyan,
+                size: 14,
+              ),
               const SizedBox(width: 8),
               const Text(
                 'Mejor mega evolución por tipo — PVE',
@@ -265,9 +314,12 @@ class _MegaTab extends StatelessWidget {
           child: ListView.builder(
             padding: const EdgeInsets.fromLTRB(12, 0, 12, 20),
             itemCount: megas.length,
-            itemBuilder: (_, i) => _TierCard(entry: megas[i], rank: i + 1, showType: true)
-                .animate().fadeIn(delay: (i * 40).ms, duration: 300.ms)
-                .slideX(begin: 0.05),
+            itemBuilder:
+                (_, i) =>
+                    _TierCard(entry: megas[i], rank: i + 1, showType: true)
+                        .animate()
+                        .fadeIn(delay: (i * 40).ms, duration: 300.ms)
+                        .slideX(begin: 0.05),
           ),
         ),
       ],
@@ -283,7 +335,11 @@ class _TierCard extends StatelessWidget {
   final int rank;
   final bool showType;
 
-  const _TierCard({required this.entry, required this.rank, this.showType = false});
+  const _TierCard({
+    required this.entry,
+    required this.rank,
+    this.showType = false,
+  });
 
   static const Map<String, Color> _tierColors = {
     'S': Color(0xFFFF4444),
@@ -295,9 +351,10 @@ class _TierCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tierColor = _tierColors[entry.tier] ?? AppTheme.textSecond;
-    final primary = entry.types.isNotEmpty
-        ? AppTheme.getTypeColor(entry.types.first)
-        : AppTheme.accentBlue;
+    final primary =
+        entry.types.isNotEmpty
+            ? AppTheme.getTypeColor(entry.types.first)
+            : AppTheme.accentBlue;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -329,11 +386,12 @@ class _TierCard extends StatelessWidget {
             child: CachedNetworkImage(
               imageUrl: entry.imageUrl,
               fit: BoxFit.contain,
-              errorWidget: (_, __, ___) => Icon(
-                Icons.catching_pokemon,
-                color: primary.withOpacity(0.3),
-                size: 32,
-              ),
+              errorWidget:
+                  (_, __, ___) => Icon(
+                    Icons.catching_pokemon,
+                    color: primary.withOpacity(0.3),
+                    size: 32,
+                  ),
             ),
           ),
           const SizedBox(width: 10),
@@ -362,7 +420,9 @@ class _TierCard extends StatelessWidget {
                     if (entry.label.isNotEmpty)
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 2),
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
                         margin: const EdgeInsets.only(left: 4),
                         decoration: BoxDecoration(
                           color: _labelColor(entry).withOpacity(0.15),
@@ -386,7 +446,9 @@ class _TierCard extends StatelessWidget {
                     if (entry.label.isEmpty && entry.formType.isNotEmpty)
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 2),
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
                         margin: const EdgeInsets.only(left: 4),
                         decoration: BoxDecoration(
                           color: _formColor(entry).withOpacity(0.15),
@@ -410,7 +472,9 @@ class _TierCard extends StatelessWidget {
                     if (entry.tierType != null)
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 2),
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
                         margin: const EdgeInsets.only(left: 4),
                         decoration: BoxDecoration(
                           color: const Color(0xFFFFD700).withOpacity(0.15),
@@ -438,17 +502,30 @@ class _TierCard extends StatelessWidget {
                 Row(
                   children: [
                     if (showType)
-                      ...entry.types.map((t) =>
-                          Padding(
-                            padding: const EdgeInsets.only(right: 4),
-                            child: TypeBadge(type: t, small: true),
-                          )),
+                      ...entry.types.map(
+                        (t) => Padding(
+                          padding: const EdgeInsets.only(right: 4),
+                          child: TypeBadge(type: t, small: true),
+                        ),
+                      ),
                     if (!showType) ...[
-                      _StatChip('ATK', entry.baseAttack, const Color(0xFFFF6B35)),
+                      _StatChip(
+                        'ATK',
+                        entry.baseAttack,
+                        const Color(0xFFFF6B35),
+                      ),
                       const SizedBox(width: 4),
-                      _StatChip('DEF', entry.baseDefense, const Color(0xFF2196F3)),
+                      _StatChip(
+                        'DEF',
+                        entry.baseDefense,
+                        const Color(0xFF2196F3),
+                      ),
                       const SizedBox(width: 4),
-                      _StatChip('STA', entry.baseStamina, const Color(0xFF4CAF50)),
+                      _StatChip(
+                        'STA',
+                        entry.baseStamina,
+                        const Color(0xFF4CAF50),
+                      ),
                     ],
                   ],
                 ),
@@ -483,7 +560,10 @@ class _TierCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: tierColor.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: tierColor.withOpacity(0.5), width: 1.5),
+                  border: Border.all(
+                    color: tierColor.withOpacity(0.5),
+                    width: 1.5,
+                  ),
                 ),
                 alignment: Alignment.center,
                 child: Text(
@@ -540,11 +620,7 @@ class _StatChip extends StatelessWidget {
     ),
     child: Text(
       '$label $value',
-      style: TextStyle(
-        color: color,
-        fontSize: 9,
-        fontWeight: FontWeight.w700,
-      ),
+      style: TextStyle(color: color, fontSize: 9, fontWeight: FontWeight.w700),
     ),
   );
 }

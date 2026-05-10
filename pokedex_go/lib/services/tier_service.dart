@@ -17,293 +17,431 @@ class TierService {
   // ─────────────────────────────────────────────────────────────────────────
   static const Map<String, List<String>> _hardcodedTop = {
     'Bug': [
-      'Mega Pinsir', 'Mega Heracross', 'Mega Beedrill', 'Pheromosa', 'Pinsir Shadow',
-      'Scizor Shadow', 'Mega Scizor', 'Volcarona', 'Scyther Shadow', 'Vikavolt',
+      'Mega Pinsir',
+      'Mega Heracross',
+      'Mega Beedrill',
+      'Pheromosa',
+      'Pinsir Shadow',
+      'Scizor Shadow',
+      'Mega Scizor',
+      'Volcarona',
+      'Scyther Shadow',
+      'Vikavolt',
     ],
     'Dark': [
-      'Mega Absol', 'Mega Tyranitar', 'Tyranitar Shadow', 'Absol', 'Mega Houndoom',
-      'Weavile Shadow Dark', 'Salamence Shadow Dark', 'Hydreigon', 'Honchkrow', 'Mega Salamence',
+      'Mega Absol',
+      'Mega Tyranitar',
+      'Tyranitar Shadow',
+      'Absol',
+      'Mega Houndoom',
+      'Weavile Shadow Dark',
+      'Salamence Shadow Dark',
+      'Hydreigon',
+      'Honchkrow',
+      'Mega Salamence',
     ],
     'Dragon': [
-      'Eternatus', 'Mega Rayquaza', 'Mega Garchomp', 'Garchomp Shadow', 'Palkia Shadow',
-      'Salamence Shadow', 'Dragonite Shadow', 'Palkia Origen', 'Mega Salamence Dragon', 'Dialga Shadow Dragon',
+      'Eternatus',
+      'Mega Rayquaza',
+      'Mega Garchomp',
+      'Garchomp Shadow',
+      'Palkia Shadow',
+      'Salamence Shadow',
+      'Dragonite Shadow',
+      'Palkia Origen',
+      'Mega Salamence Dragon',
+      'Dialga Shadow Dragon',
     ],
     'Electric': [
-      'Regieleki', 'Raikou Shadow', 'Electivire Shadow', 'Xurkitree', 'Mega Manectric',
-      'Thundurus Totem', 'Zapdos Shadow', 'Magnezone Shadow', 'Zekrom', 'Luxray Shadow',
+      'Regieleki',
+      'Raikou Shadow',
+      'Electivire Shadow',
+      'Xurkitree',
+      'Mega Manectric',
+      'Thundurus Totem',
+      'Zapdos Shadow',
+      'Magnezone Shadow',
+      'Zekrom',
+      'Luxray Shadow',
     ],
     'Fairy': [
-      'Mega Gardevoir', 'Zacian', 'Gardevoir Shadow', 'Mega Alakazam Fairy', 'Enamorus',
-      'Xurkitree Fairy', 'Grandbull Shadow', 'Xerneas', 'Alakazam Shadow', 'Gardevoir',
+      'Mega Gardevoir',
+      'Zacian',
+      'Gardevoir Shadow',
+      'Mega Alakazam Fairy',
+      'Enamorus',
+      'Xurkitree Fairy',
+      'Grandbull Shadow',
+      'Xerneas',
+      'Alakazam Shadow',
+      'Gardevoir',
     ],
     'Fighting': [
-      'Mega Lucario', 'Mega Blaziken', 'Lucario', 'Mega Heracross Fighting', 'Conkeldurr Shadow',
-      'Terrakion', 'Machamp Shadow', 'Mega Alakazam', 'Hariyama Shadow', 'Keldeo',
+      'Mega Lucario',
+      'Mega Blaziken',
+      'Lucario',
+      'Mega Heracross Fighting',
+      'Conkeldurr Shadow',
+      'Terrakion',
+      'Machamp Shadow',
+      'Mega Alakazam',
+      'Hariyama Shadow',
+      'Keldeo',
     ],
     'Fire': [
-      'Mega Blaziken Fire', 'Mega Charizard Y', 'Heatran Shadow', 'Blaziken Shadow', 'Chandelure Shadow',
-      'Darmanitan Shadow', 'Emboar Shadow', 'Moltres Shadow', 'Reshiram', 'Charizard Shadow',
+      'Mega Blaziken Fire',
+      'Mega Charizard Y',
+      'Heatran Shadow',
+      'Blaziken Shadow',
+      'Chandelure Shadow',
+      'Darmanitan Shadow',
+      'Emboar Shadow',
+      'Moltres Shadow',
+      'Reshiram',
+      'Charizard Shadow',
     ],
     'Flying': [
-      'Mega Rayquaza Flying', 'Rayquaza', 'Salamence Shadow Flying', 'Staraptor Shadow', 'Moltres Shadow Flying',
-      'Mega Salamence Flying', 'Mega Pidgeot', 'Yveltal', 'Enamorus Flying', 'Honchkrow Shadow',
+      'Mega Rayquaza Flying',
+      'Rayquaza',
+      'Salamence Shadow Flying',
+      'Staraptor Shadow',
+      'Moltres Shadow Flying',
+      'Mega Salamence Flying',
+      'Mega Pidgeot',
+      'Yveltal',
+      'Enamorus Flying',
+      'Honchkrow Shadow',
     ],
     'Ghost': [
-      'Mega Gengar', 'Necrozma (Lunala)', 'Chandelure Shadow Ghost', 'Gengar Shadow Ghost', 'Mega Bannete',
-      'Mewtwo Shadow Ghost', 'Blacephalon', 'Gengar', 'Chandelure', 'Dragapult',
+      'Mega Gengar',
+      'Necrozma (Lunala)',
+      'Chandelure Shadow Ghost',
+      'Gengar Shadow Ghost',
+      'Mega Bannete',
+      'Mewtwo Shadow Ghost',
+      'Blacephalon',
+      'Gengar',
+      'Chandelure',
+      'Dragapult',
     ],
     'Grass': [
-      'Mega Sceptile', 'Kartana', 'Shaymin (cielo)', 'Mega Venusaur', 'Venusaur Shadow',
-      'Sceptile Shadow', 'Tangrowth Shadow', 'Torterra Shadow', 'Zarude', 'Meowscarada',
+      'Mega Sceptile',
+      'Kartana',
+      'Shaymin (cielo)',
+      'Mega Venusaur',
+      'Venusaur Shadow',
+      'Sceptile Shadow',
+      'Tangrowth Shadow',
+      'Torterra Shadow',
+      'Zarude',
+      'Meowscarada',
     ],
     'Ground': [
-      'Mega Primal Groudon', 'Mega Garchomp', 'Groudon Shadow', 'Garchomp Shadow Ground', 'Excadrill Shadow',
-      'Landorus', 'Mamoswine Shadow', 'Rhyperior Shadow', 'Groudon', 'Golurk Shadow',
+      'Mega Primal Groudon',
+      'Mega Garchomp',
+      'Groudon Shadow',
+      'Garchomp Shadow Ground',
+      'Excadrill Shadow',
+      'Landorus',
+      'Mamoswine Shadow',
+      'Rhyperior Shadow',
+      'Groudon',
+      'Golurk Shadow',
     ],
     'Ice': [
-      'Kyurem Blanco', 'Kyurem Negro', 'Mamoswine Shadow Ice', 'Weavile Shadow', 'Mewtwo Shadow Ice',
-      'Darmanitan', 'Baxcalibur', 'Mega Glalie', 'Mega Abomasnow', 'Mamoswine',
+      'Kyurem Blanco',
+      'Kyurem Negro',
+      'Mamoswine Shadow Ice',
+      'Weavile Shadow',
+      'Mewtwo Shadow Ice',
+      'Darmanitan',
+      'Baxcalibur',
+      'Mega Glalie',
+      'Mega Abomasnow',
+      'Mamoswine',
     ],
     'Poison': [
-      'Mega Beedrill Poison', 'Mega Gengar Poison', 'Eternatus Poison', 'Naganadel', 'Nihilego',
-      'Toxicroak Shadow', 'Roserade', 'Victreebel Shadow', 'Vileplume Shadow', 'Skuntank Shadow',
+      'Mega Beedrill Poison',
+      'Mega Gengar Poison',
+      'Eternatus Poison',
+      'Naganadel',
+      'Nihilego',
+      'Toxicroak Shadow',
+      'Roserade',
+      'Victreebel Shadow',
+      'Vileplume Shadow',
+      'Skuntank Shadow',
     ],
     'Psychic': [
-      'Mewtwo Shadow', 'Mega Alakazam Psychic', 'Mewtwo', 'Mega Gallade/Gardevoir', 'Mega Latios',
-      'Hoopa (Desatado)', 'Alakazam Shadow Psychic', 'Latios Shadow', 'Metagross Shadow', 'Exeggutor Shadow',
+      'Mewtwo Shadow',
+      'Mega Alakazam Psychic',
+      'Mewtwo',
+      'Mega Gallade/Gardevoir',
+      'Mega Latios',
+      'Hoopa (Desatado)',
+      'Alakazam Shadow Psychic',
+      'Latios Shadow',
+      'Metagross Shadow',
+      'Exeggutor Shadow',
     ],
     'Rock': [
-      'Rampardos Shadow', 'Mega Diancie', 'Rhyperior Shadow Rock', 'Tyrantrum Shadow', 'Mega Tyranitar Rock',
-      'Gigalith Shadow', 'Mega Aerodactyl', 'Tyranitar Shadow', 'Rampardos', 'Rhyperior',
+      'Rampardos Shadow',
+      'Mega Diancie',
+      'Rhyperior Shadow Rock',
+      'Tyrantrum Shadow',
+      'Mega Tyranitar Rock',
+      'Gigalith Shadow',
+      'Mega Aerodactyl',
+      'Tyranitar Shadow',
+      'Rampardos',
+      'Rhyperior',
     ],
     'Steel': [
-      'Zacian Steel', 'Zamazenta', 'Necrozma (Solgaleo)', 'Metagross Shadow Steel', 'Dialga Shadow',
-      'Metagross', 'Excadrill Shadow', 'Dialga', 'Dialga Origen Steel', 'Mega Lucario Steel',
+      'Zacian Steel',
+      'Zamazenta',
+      'Necrozma (Solgaleo)',
+      'Metagross Shadow Steel',
+      'Dialga Shadow',
+      'Metagross',
+      'Excadrill Shadow',
+      'Dialga',
+      'Dialga Origen Steel',
+      'Mega Lucario Steel',
     ],
     'Water': [
-      'Mega Primal Kyogre', 'Kyogre Shadow', 'Mega Swampert', 'Mega Blastoise', 'Swampert Shadow',
-      'Samurott Shadow', 'Empoleon Shadow', 'Feraligatr Shadow', 'Mega Gyarados', 'Kyogre',
+      'Mega Primal Kyogre',
+      'Kyogre Shadow',
+      'Mega Swampert',
+      'Mega Blastoise',
+      'Swampert Shadow',
+      'Samurott Shadow',
+      'Empoleon Shadow',
+      'Feraligatr Shadow',
+      'Mega Gyarados',
+      'Kyogre',
     ],
   };
 
   // Top megas por tipo (mejor mega de cada tipo para PVE)
   static const Map<String, String> _hardcodedMegas = {
-    'Bug':      'Mega Pinsir',
-    'Dark':     'Mega Absol',
-    'Dragon':   'Mega Rayquaza',
+    'Bug': 'Mega Pinsir',
+    'Dark': 'Mega Absol',
+    'Dragon': 'Mega Rayquaza',
     'Electric': 'Mega Manectric',
-    'Fairy':    'Mega Gardevoir',
+    'Fairy': 'Mega Gardevoir',
     'Fighting': 'Mega Lucario',
-    'Fire':     'Mega Blaziken',
-    'Flying':   'Mega Rayquaza',
-    'Ghost':    'Mega Gengar',
-    'Grass':    'Mega Sceptile',
-    'Ground':   'Primal Groudon',
-    'Ice':      'Mega Glalie',
-    'Poison':   'Mega Beedrill',
-    'Psychic':  'Mega Alakazam',
-    'Rock':     'Mega Diancie',
-    'Steel':    'Mega Lucario',
-    'Water':    'Primal Kyogre',
+    'Fire': 'Mega Blaziken',
+    'Flying': 'Mega Rayquaza',
+    'Ghost': 'Mega Gengar',
+    'Grass': 'Mega Sceptile',
+    'Ground': 'Primal Groudon',
+    'Ice': 'Mega Glalie',
+    'Poison': 'Mega Beedrill',
+    'Psychic': 'Mega Alakazam',
+    'Rock': 'Mega Diancie',
+    'Steel': 'Mega Lucario',
+    'Water': 'Primal Kyogre',
   };
 
   // Movimientos óptimos PVE por nombre hardcodeado
   // Formato: 'Nombre' -> ['Movimiento Rápido', 'Movimiento Cargado']
   static const Map<String, List<String>> _hardcodedMoves = {
     // ── BUG ──
-    'Mega Pinsir Bug':        ['Picadura', 'Tijera X'],
-    'Mega Heracross':         ['Estoicismo', 'Megacuerno'],
-    'Mega Beedrill':          ['Acoso', 'Tijera X'],
-    'Pheromosa':              ['Picadura', 'Tijera X'],
-    'Pinsir Shadow':          ['Picadura', 'Tijera X'],
-    'Scizor Shadow':          ['Corte Furia', 'Tijera X'],
-    'Mega Scizor':            ['Corte Furia', 'Tijera X'],
-    'Volcarona':              ['Picadura', 'Zumbido'],
-    'Scyther Shadow':         ['Corte Furia', 'Zumbido*'],
-    'Vikavolt':               ['Picadura', 'Zumbido'],
+    'Mega Pinsir Bug': ['Picadura', 'Tijera X'],
+    'Mega Heracross': ['Estoicismo', 'Megacuerno'],
+    'Mega Beedrill': ['Acoso', 'Tijera X'],
+    'Pheromosa': ['Picadura', 'Tijera X'],
+    'Pinsir Shadow': ['Picadura', 'Tijera X'],
+    'Scizor Shadow': ['Corte Furia', 'Tijera X'],
+    'Mega Scizor': ['Corte Furia', 'Tijera X'],
+    'Volcarona': ['Picadura', 'Zumbido'],
+    'Scyther Shadow': ['Corte Furia', 'Zumbido*'],
+    'Vikavolt': ['Picadura', 'Zumbido'],
     // ── DARK ──
-    'Mega Absol':             ['Alarido', 'Giro Vil*'],
-    'Mega Tyranitar':         ['Mordisco', 'Giro Vil'],
-    'Tyranitar Shadow':       ['Mordisco', 'Giro Vil'],
-    'Absol':                  ['Alarido', 'Giro Vil*'],
-    'Mega Houndoom':          ['Alarido', 'Juego Sucio'],
-    'Weavile Shadow Dark':    ['Alarido', 'Juego Sucio'],
-    'Salamence Shadow Dark':  ['Mordisco', 'Giro Vil'],
-    'Hydreigon':              ['Mordisco', 'Giro Vil*'],
-    'Honchkrow':              ['Alarido', 'Pulso Umbrío'],
-    'Mega Salamence':         ['Mordisco', 'Giro Vil'],
+    'Mega Absol': ['Alarido', 'Giro Vil*'],
+    'Mega Tyranitar': ['Mordisco', 'Giro Vil'],
+    'Tyranitar Shadow': ['Mordisco', 'Giro Vil'],
+    'Absol': ['Alarido', 'Giro Vil*'],
+    'Mega Houndoom': ['Alarido', 'Juego Sucio'],
+    'Weavile Shadow Dark': ['Alarido', 'Juego Sucio'],
+    'Salamence Shadow Dark': ['Mordisco', 'Giro Vil'],
+    'Hydreigon': ['Mordisco', 'Giro Vil*'],
+    'Honchkrow': ['Alarido', 'Pulso Umbrío'],
+    'Mega Salamence': ['Mordisco', 'Giro Vil'],
     // ── DRAGON ──
-    'Eternatus':              ['Cola Dragón', 'Cañon Dinamax'],
-    'Mega Rayquaza':          ['Cola Dragón', 'Vasto Impacto*'],
-    'Mega Garchomp':          ['Cola Dragón', 'Vasto Impacto'],
-    'Garchomp Shadow':        ['Cola Dragón', 'Vasto Impacto'],
-    'Palkia Shadow':          ['Cola Dragón', 'Cometa Draco'],
-    'Salamence Shadow':       ['Cola Dragón', 'Cometa Draco'],
-    'Dragonite Shadow':       ['Cola Dragón', 'Cometa Draco*'],
-    'Palkia Origen':          ['Cola Dragón', 'Corte Vacio'],
-    'Mega Salamence Dragon':  ['Cola Dragón', 'Cometa Draco'],
-    'Dialga Shadow Dragon':   ['Dragoaliento', 'Cometa Draco'],
+    'Eternatus': ['Cola Dragón', 'Cañon Dinamax'],
+    'Mega Rayquaza': ['Cola Dragón', 'Vasto Impacto*'],
+    'Mega Garchomp': ['Cola Dragón', 'Vasto Impacto'],
+    'Garchomp Shadow': ['Cola Dragón', 'Vasto Impacto'],
+    'Palkia Shadow': ['Cola Dragón', 'Cometa Draco'],
+    'Salamence Shadow': ['Cola Dragón', 'Cometa Draco'],
+    'Dragonite Shadow': ['Cola Dragón', 'Cometa Draco*'],
+    'Palkia Origen': ['Cola Dragón', 'Corte Vacio'],
+    'Mega Salamence Dragon': ['Cola Dragón', 'Cometa Draco'],
+    'Dialga Shadow Dragon': ['Dragoaliento', 'Cometa Draco'],
     // ── ELECTRIC ──
-    'Regieleki':              ['Impactrueno', 'Electrojaula*'],
-    'Raikou Shadow':          ['Impactrueno', 'Voltio Cruel'],
-    'Electivire Shadow':      ['Impactrueno', 'Voltio Cruel'],
-    'Xurkitree':              ['Impactrueno', 'Chispazo'],
-    'Mega Manectric':         ['Colmillo Rayo', 'Voltio Cruel'],
-    'Thundurus Totem':        ['Voltiocambio', 'Electormenta*'],
-    'Zapdos Shadow':          ['Impactrueno', 'Rayo'],
-    'Magnezone Shadow':       ['Chispa', 'Voltio Cruel'],
-    'Zekrom':                 ['Rayo Carga', 'Rayo Fusion*'],
-    'Luxray Shadow':          ['Chispa', 'Voltio Cruel'],
+    'Regieleki': ['Impactrueno', 'Electrojaula*'],
+    'Raikou Shadow': ['Impactrueno', 'Voltio Cruel'],
+    'Electivire Shadow': ['Impactrueno', 'Voltio Cruel'],
+    'Xurkitree': ['Impactrueno', 'Chispazo'],
+    'Mega Manectric': ['Colmillo Rayo', 'Voltio Cruel'],
+    'Thundurus Totem': ['Voltiocambio', 'Electormenta*'],
+    'Zapdos Shadow': ['Impactrueno', 'Rayo'],
+    'Magnezone Shadow': ['Chispa', 'Voltio Cruel'],
+    'Zekrom': ['Rayo Carga', 'Rayo Fusion*'],
+    'Luxray Shadow': ['Chispa', 'Voltio Cruel'],
     // ── FAIRY ──
-    'Mega Gardevoir':         ['Encanto', 'Brillo Mágico'],
-    'Zacian':                 ['Garra Metal', 'Carantoña'],
-    'Gardevoir Shadow':       ['Encanto', 'Brillo Mágico'],
-    'Mega Alakazam Fairy':    ['Psicocorte', 'Brillo Mágico*'],
-    'Enamorus':               ['Viento Feerico', 'Brillo Mágico'],
-    'Xurkitree Fairy':        ['Impactrueno', 'Brillo Mágico'],
-    'Grandbull Shadow':       ['Encanto', 'Carantoña'],
-    'Xerneas':                ['Geocontrol*', 'Fuerza Lunar'],
-    'Alakazam Shadow':        ['Psicocorte', 'Brillo Mágico*'],
-    'Gardevoir':              ['Encanto', 'Brillo Mágico'],
+    'Mega Gardevoir': ['Encanto', 'Brillo Mágico'],
+    'Zacian': ['Garra Metal', 'Carantoña'],
+    'Gardevoir Shadow': ['Encanto', 'Brillo Mágico'],
+    'Mega Alakazam Fairy': ['Psicocorte', 'Brillo Mágico*'],
+    'Enamorus': ['Viento Feerico', 'Brillo Mágico'],
+    'Xurkitree Fairy': ['Impactrueno', 'Brillo Mágico'],
+    'Grandbull Shadow': ['Encanto', 'Carantoña'],
+    'Xerneas': ['Geocontrol*', 'Fuerza Lunar'],
+    'Alakazam Shadow': ['Psicocorte', 'Brillo Mágico*'],
+    'Gardevoir': ['Encanto', 'Brillo Mágico'],
     // ── FIGHTING ──
-    'Mega Lucario':           ['Palmeo*', 'Esfera Aural'],
-    'Mega Blaziken':          ['Contraataque', 'Onda Certera'],
-    'Lucario':                ['Palmeo*', 'Esfera Aural'],
-    'Mega Herracross Fighting':['Contraataque', 'A Bocajarro'],
-    'Conkeldurr Shadow':      ['Contraataque', 'Puño Dinámico'],
-    'Terrakion':              ['Doble Patada', 'Espada Santa*'],
-    'Machamp Shadow':         ['Contraataque', 'Puño Dinámico'],
-    'Mega Alakazam':          ['Contraataque*', 'Onda Certera'],
-    'Hariyama Shadow':        ['Palmeo', 'Puño Dinámico'],
-    'Keldeo':                 ['Patada Baja', 'Espada Santa'],
+    'Mega Lucario': ['Palmeo*', 'Esfera Aural'],
+    'Mega Blaziken': ['Contraataque', 'Onda Certera'],
+    'Lucario': ['Palmeo*', 'Esfera Aural'],
+    'Mega Herracross Fighting': ['Contraataque', 'A Bocajarro'],
+    'Conkeldurr Shadow': ['Contraataque', 'Puño Dinámico'],
+    'Terrakion': ['Doble Patada', 'Espada Santa*'],
+    'Machamp Shadow': ['Contraataque', 'Puño Dinámico'],
+    'Mega Alakazam': ['Contraataque*', 'Onda Certera'],
+    'Hariyama Shadow': ['Palmeo', 'Puño Dinámico'],
+    'Keldeo': ['Patada Baja', 'Espada Santa'],
     // ── FIRE ──
-    'Mega Charizard Y':       ['Giro Fuego', 'Anillo Ígneo*'],
-    'Mega Blaziken Fire':     ['Giro Fuego', 'Anillo Ígneo*'],
-    'Heatran Shadow':         ['Giro Fuego', 'Lluvia Ígneo*'],
-    'Blaziken Shadow':        ['Giro Fuego', 'Anillo Ígneo'],
-    'Chandelure Shadow':      ['Giro Fuego', 'Sofoco'],
-    'Darmanitan Shadow':      ['Colmillo Igneo', 'Sofoco'],
-    'Emboar Shadow':          ['Ascuas', 'Anillo Ígneo*'],
-    'Moltres Shadow':         ['Giro Fuego', 'Sofoco'],
-    'Reshiram':               ['Colmillo Igneo', 'Llama Fusion*'],
-    'Charizard Shadow':       ['Giro Fuego', 'Anillo Ígneo*'],
+    'Mega Charizard Y': ['Giro Fuego', 'Anillo Ígneo*'],
+    'Mega Blaziken Fire': ['Giro Fuego', 'Anillo Ígneo*'],
+    'Heatran Shadow': ['Giro Fuego', 'Lluvia Ígneo*'],
+    'Blaziken Shadow': ['Giro Fuego', 'Anillo Ígneo'],
+    'Chandelure Shadow': ['Giro Fuego', 'Sofoco'],
+    'Darmanitan Shadow': ['Colmillo Igneo', 'Sofoco'],
+    'Emboar Shadow': ['Ascuas', 'Anillo Ígneo*'],
+    'Moltres Shadow': ['Giro Fuego', 'Sofoco'],
+    'Reshiram': ['Colmillo Igneo', 'Llama Fusion*'],
+    'Charizard Shadow': ['Giro Fuego', 'Anillo Ígneo*'],
     // ── FLYING ──
-    'Mega Rayquaza Flying':   ['Tajo Aéreo', 'Ascenso Draco'],
-    'Rayquaza':               ['Tajo Aéreo', 'Ascenso Draco'],
-    'Salamence Shadow Flying':['Colmillo Igneo', 'Vuelo'],
-    'Staraptor Shadow':       ['Tornado*', 'Vuelo'],
-    'Moltres Shadow Flying':  ['Ataque Ala', 'Ataque Aereo*'],
-    'Mega Salamence Flying':  ['Colmillo Igneo', 'Vuelo'],
-    'Mega Pidgeot':           ['Tornado*', 'Pajaro Osado'],
-    'Yveltal':                ['Tornado', 'Ala Mortifera*'],
-    'Enamorus Flying':        ['Viento Feerico', 'Vuelo'],
-    'Honchkrow Shadow':       ['Picotazo', 'Ataque Aéreo'],
+    'Mega Rayquaza Flying': ['Tajo Aéreo', 'Ascenso Draco'],
+    'Rayquaza': ['Tajo Aéreo', 'Ascenso Draco'],
+    'Salamence Shadow Flying': ['Colmillo Igneo', 'Vuelo'],
+    'Staraptor Shadow': ['Tornado*', 'Vuelo'],
+    'Moltres Shadow Flying': ['Ataque Ala', 'Ataque Aereo*'],
+    'Mega Salamence Flying': ['Colmillo Igneo', 'Vuelo'],
+    'Mega Pidgeot': ['Tornado*', 'Pajaro Osado'],
+    'Yveltal': ['Tornado', 'Ala Mortifera*'],
+    'Enamorus Flying': ['Viento Feerico', 'Vuelo'],
+    'Honchkrow Shadow': ['Picotazo', 'Ataque Aéreo'],
     // ── GHOST ──
-    'Mega Gengar':            ['Lengüetazo*', 'Bola Sombra'],
-    'Necrozma (Lunala)':      ['Garra Umbría', 'Rayo Umbrio'],
-    'Chandelure Shadow Ghost':['Infortunio', 'Bola Sombra'],
-    'Gengar Shadow Ghost':    ['Lengüetazo*', 'Bola Sombra'],
-    'Mega Bannete':           ['Garra Umbría', 'Bola Sombra'],
-    'Gengar':                 ['Lengüetazo*', 'Bola Sombra'],
-    'Mewtwo Shadow Ghost':          ['Psicocorte', 'Bola Sombra*'],
-    'Blacephalon':            ['Impresionar', 'Bola Sombra'],
-    'Chandelure':             ['Infortunio', 'Bola Sombra'],
-    'Dragapult':              ['Impresionar', 'Bola Sombra'],
+    'Mega Gengar': ['Lengüetazo*', 'Bola Sombra'],
+    'Necrozma (Lunala)': ['Garra Umbría', 'Rayo Umbrio'],
+    'Chandelure Shadow Ghost': ['Infortunio', 'Bola Sombra'],
+    'Gengar Shadow Ghost': ['Lengüetazo*', 'Bola Sombra'],
+    'Mega Bannete': ['Garra Umbría', 'Bola Sombra'],
+    'Gengar': ['Lengüetazo*', 'Bola Sombra'],
+    'Mewtwo Shadow Ghost': ['Psicocorte', 'Bola Sombra*'],
+    'Blacephalon': ['Impresionar', 'Bola Sombra'],
+    'Chandelure': ['Infortunio', 'Bola Sombra'],
+    'Dragapult': ['Impresionar', 'Bola Sombra'],
     // ── GRASS ──
-    'Mega Sceptile':          ['Semilladora', 'Planta Feroz*'],
-    'Kartana':                ['Hoja Afilada', 'Hoja Aguda'],
-    'Shaymin (cielo)':        ['Hoja Magica', 'Hierba Lazo'],
-    'Mega Venusaur':          ['Látigo Cepa', 'Planta Feroz*'],
-    'Venusaur Shadow':        ['Látigo Cepa', 'Planta Feroz*'],
-    'Sceptile Shadow':        ['Semilladora', 'Planta Feroz*'],
-    'Tangrowth Shadow':       ['Látigo Cepa', 'Latigazo'],
-    'Torterra Shadow':        ['Hoja Afilada', 'Planta Feroz*'],
-    'Zarude':                 ['Látigo Cepa', 'Latigazo'],
-    'Meowscarada':            ['follaje', 'Planta Feroz*'],
+    'Mega Sceptile': ['Semilladora', 'Planta Feroz*'],
+    'Kartana': ['Hoja Afilada', 'Hoja Aguda'],
+    'Shaymin (cielo)': ['Hoja Magica', 'Hierba Lazo'],
+    'Mega Venusaur': ['Látigo Cepa', 'Planta Feroz*'],
+    'Venusaur Shadow': ['Látigo Cepa', 'Planta Feroz*'],
+    'Sceptile Shadow': ['Semilladora', 'Planta Feroz*'],
+    'Tangrowth Shadow': ['Látigo Cepa', 'Latigazo'],
+    'Torterra Shadow': ['Hoja Afilada', 'Planta Feroz*'],
+    'Zarude': ['Látigo Cepa', 'Latigazo'],
+    'Meowscarada': ['follaje', 'Planta Feroz*'],
     // ── GROUND ──
-    'Mega Primal Groudon':    ['Disparo Lodo', 'Filo del Abismo*'],
-    'Groudon Shadow':         ['Disparo Lodo', 'Filo del Abismo*'],
+    'Mega Primal Groudon': ['Disparo Lodo', 'Filo del Abismo*'],
+    'Groudon Shadow': ['Disparo Lodo', 'Filo del Abismo*'],
     'Grachomp Shadow Ground': ['Disparo Lodo', 'Tierra Viva*'],
-    'Excadrill Shadow':       ['Bofeton Lodo', 'Arenas Ardientes'],
-    'Landorus':               ['Disparo Lodo', 'Simun de Arena*'],
-    'Mamoswine Shadow':       ['Bofeton Lodo', 'Fuerza Equina'],
-    'Rhyperior Shadow':       ['Bofeton Lodo', 'Terremoto'],
-    'Groudon':                ['Disparo Lodo', 'Filo del Abismo*'],
-    'Golurk Shadow':          ['Bofeton Lodo', 'Tierra Viva'],
+    'Excadrill Shadow': ['Bofeton Lodo', 'Arenas Ardientes'],
+    'Landorus': ['Disparo Lodo', 'Simun de Arena*'],
+    'Mamoswine Shadow': ['Bofeton Lodo', 'Fuerza Equina'],
+    'Rhyperior Shadow': ['Bofeton Lodo', 'Terremoto'],
+    'Groudon': ['Disparo Lodo', 'Filo del Abismo*'],
+    'Golurk Shadow': ['Bofeton Lodo', 'Tierra Viva'],
     // ── ICE ──
-    'Kyurem Blanco':          ['Colmillo Hielo', 'Llama gelida'],
-    'Kyurem Negro':           ['Cola Dragon', 'Rayo Gelido'],
-    'Mamoswine Shadow Ice':   ['Nieve Polvo', 'Alud'],
-    'Weavile Shadow':         ['Canto Helado', 'Alud'],
-    'Mewtwo Shadow Ice':      ['Psicocorte', 'Rayo Hielo'],
-    'Darmanitan':             ['Colmillo Hielo', 'Alud'],
-    'Baxcalibur':             ['Colmillo Hielo', 'Alud'],
-    'Mega Glalie':            ['Vaho Gelido', 'Alud'],
-    'Mega Abomasnow':         ['Nieve Polvo', 'Meteorobola'],
-    'Mamoswine':              ['Nieve Polvo', 'Alud'],
+    'Kyurem Blanco': ['Colmillo Hielo', 'Llama gelida'],
+    'Kyurem Negro': ['Cola Dragon', 'Rayo Gelido'],
+    'Mamoswine Shadow Ice': ['Nieve Polvo', 'Alud'],
+    'Weavile Shadow': ['Canto Helado', 'Alud'],
+    'Mewtwo Shadow Ice': ['Psicocorte', 'Rayo Hielo'],
+    'Darmanitan': ['Colmillo Hielo', 'Alud'],
+    'Baxcalibur': ['Colmillo Hielo', 'Alud'],
+    'Mega Glalie': ['Vaho Gelido', 'Alud'],
+    'Mega Abomasnow': ['Nieve Polvo', 'Meteorobola'],
+    'Mamoswine': ['Nieve Polvo', 'Alud'],
     // ── POISON ──
-    'Mega Beedrill Poison':   ['Puya Nociva', 'Bomba Lodo'],
-    'Mega Gengar Poison':     ['Lengüetazo*', 'Bomba Lodo'],
-    'Eternatus Poison':       ['Puya Nociva', 'Bomba Lodo'],
-    'Nihilego':               ['Puya Nociva', 'Bomba Lodo'],
-    'Naganadel':              ['Puya Nociva', 'Bomba Lodo'],
-    'Toxicroak Shadow':       ['Puya Nociva', 'Bomba Lodo'],
-    'Roserade':               ['Puya Nociva', 'Bomba Lodo'],
-    'Victreebel Shadow':      ['Ácido', 'Bomba Lodo'],
-    'Vileplume Shadow':       ['Ácido', 'Bomba Lodo'],
-    'Skuntank Shadow':        ['Puya Nociva', 'Bomba Lodo'],
+    'Mega Beedrill Poison': ['Puya Nociva', 'Bomba Lodo'],
+    'Mega Gengar Poison': ['Lengüetazo*', 'Bomba Lodo'],
+    'Eternatus Poison': ['Puya Nociva', 'Bomba Lodo'],
+    'Nihilego': ['Puya Nociva', 'Bomba Lodo'],
+    'Naganadel': ['Puya Nociva', 'Bomba Lodo'],
+    'Toxicroak Shadow': ['Puya Nociva', 'Bomba Lodo'],
+    'Roserade': ['Puya Nociva', 'Bomba Lodo'],
+    'Victreebel Shadow': ['Ácido', 'Bomba Lodo'],
+    'Vileplume Shadow': ['Ácido', 'Bomba Lodo'],
+    'Skuntank Shadow': ['Puya Nociva', 'Bomba Lodo'],
     // ── PSYCHIC ──
-    'Mewtwo Shadow':          ['Psicocorte', 'Onda Mental*'],
-    'Mega Alakazam Psychic':  ['Confusión', 'Psíquico*'],
-    'Mewtwo':                 ['Psicocorte', 'Onda Mental*'],
+    'Mewtwo Shadow': ['Psicocorte', 'Onda Mental*'],
+    'Mega Alakazam Psychic': ['Confusión', 'Psíquico*'],
+    'Mewtwo': ['Psicocorte', 'Onda Mental*'],
     'Mega Gallade/Gardevoir': ['Confusión', 'Psíquico'],
-    'Mega Latios':            ['Cabezazo Zen', 'Psíquico'],
-    'Hoopa (Desatado)':       ['Confusión', 'Psíquico'],
-    'Alakazam Shadow Psychic':['Confusión', 'Psíquico*'],
-    'Latios Shadow':          ['Cabezazo Zen', 'Psíquico'],
-    'Metagross Shadow':       ['Cabezazo Zen', 'Psíquico'],
-    'Exeggutor Shadow':       ['Confusión', 'Psíquico'],
+    'Mega Latios': ['Cabezazo Zen', 'Psíquico'],
+    'Hoopa (Desatado)': ['Confusión', 'Psíquico'],
+    'Alakazam Shadow Psychic': ['Confusión', 'Psíquico*'],
+    'Latios Shadow': ['Cabezazo Zen', 'Psíquico'],
+    'Metagross Shadow': ['Cabezazo Zen', 'Psíquico'],
+    'Exeggutor Shadow': ['Confusión', 'Psíquico'],
     // ── ROCK ──
-    'Rampardos Shadow':       ['Antiaereo', 'Avalancha'],
-    'Mega Diancie':           ['Lanzarrocas', 'Avalancha'],
-    'Rhyperior Shadow Rock':       ['Antiaereo', 'Romperrocas*'],
-    'Tyrantrum Shadow':       ['Lanzarrocas', 'Rayo Meteorico'],
-    'Mega Tyranitar Rock':    ['Antiaereo*', 'Roca Afilada'],
-    'Gigalith Shadow':        ['Antiaereo', 'Rayo Meteórico'],
-    'Mega Aerodactyl':        ['Lanzarrocas', 'Avalancha'],
-    'Rampardos':              ['Antiaereo', 'Avalancha'],
-    'Rhyperior':              ['Antiaereo', 'Romperrocas*'],
+    'Rampardos Shadow': ['Antiaereo', 'Avalancha'],
+    'Mega Diancie': ['Lanzarrocas', 'Avalancha'],
+    'Rhyperior Shadow Rock': ['Antiaereo', 'Romperrocas*'],
+    'Tyrantrum Shadow': ['Lanzarrocas', 'Rayo Meteorico'],
+    'Mega Tyranitar Rock': ['Antiaereo*', 'Roca Afilada'],
+    'Gigalith Shadow': ['Antiaereo', 'Rayo Meteórico'],
+    'Mega Aerodactyl': ['Lanzarrocas', 'Avalancha'],
+    'Rampardos': ['Antiaereo', 'Avalancha'],
+    'Rhyperior': ['Antiaereo', 'Romperrocas*'],
     // ── STEEL ──
-    'Zacian Steel':           ['Garra Metal', 'Tajo Supremo'],
-    'Zamazenta':              ['Garra Metal', 'Embate Supremo'],
-    'Necrozma (Solgaleo)':    ['Garra Metal', 'MeteoImpacto'],
+    'Zacian Steel': ['Garra Metal', 'Tajo Supremo'],
+    'Zamazenta': ['Garra Metal', 'Embate Supremo'],
+    'Necrozma (Solgaleo)': ['Garra Metal', 'MeteoImpacto'],
     'Metagross Shadow Steel': ['Puño Bala', 'Puño Meteoro'],
-    'Dialga Shadow':          ['Garra Metal', 'Cabeza de Hierro'],
-    'Metagross':              ['Puño Bala', 'Puño Meteoro'],
-    'Dialga':                 ['Garra Metal', 'Cabeza de Hierro'],
-    'Dialga Origen':          ['Garra Metal', 'Cabeza de Hierro'],
+    'Dialga Shadow': ['Garra Metal', 'Cabeza de Hierro'],
+    'Metagross': ['Puño Bala', 'Puño Meteoro'],
+    'Dialga': ['Garra Metal', 'Cabeza de Hierro'],
+    'Dialga Origen': ['Garra Metal', 'Cabeza de Hierro'],
     'Excadrill Shadow Steel': ['Garra Metal', 'Cabeza de Hierro'],
-    'Mega Lucario Steel':     ['Puño Bala', 'Foco Resplandor'],
+    'Mega Lucario Steel': ['Puño Bala', 'Foco Resplandor'],
     // ── WATER ──
-    'Mega Primal Kyogre':     ['Cascada', 'Pulso Primigenio*'],
-    'Kyogre Shadow':          ['Cascada', 'Pulso Primigenio*'],
-    'Mega Swampert':          ['Pistola Agua', 'Hidrocañón*'],
-    'Mega Blastoise':         ['Pistola Agua', 'Hidrocañón*'],
-    'Swampert Shadow':        ['Pistola Agua', 'Hidrocañón*'],
-    'Samurott Shadow':        ['Cascada', 'Hidrocañón*'],
-    'Empoleon Shadow':        ['Pistola Agua', 'Hidrocañón*'],
-    'Feraligatr Shadow':      ['Pistola Agua*', 'Hidrocañón*'],
-    'Mega Gyarados':          ['Cascada', 'Hidrobomba'],
-    'Kyogre':                 ['Cascada', 'Pulso Primigenio*'],
+    'Mega Primal Kyogre': ['Cascada', 'Pulso Primigenio*'],
+    'Kyogre Shadow': ['Cascada', 'Pulso Primigenio*'],
+    'Mega Swampert': ['Pistola Agua', 'Hidrocañón*'],
+    'Mega Blastoise': ['Pistola Agua', 'Hidrocañón*'],
+    'Swampert Shadow': ['Pistola Agua', 'Hidrocañón*'],
+    'Samurott Shadow': ['Cascada', 'Hidrocañón*'],
+    'Empoleon Shadow': ['Pistola Agua', 'Hidrocañón*'],
+    'Feraligatr Shadow': ['Pistola Agua*', 'Hidrocañón*'],
+    'Mega Gyarados': ['Cascada', 'Hidrobomba'],
+    'Kyogre': ['Cascada', 'Pulso Primigenio*'],
     // ── MEGAS TAB ──
-    'Primal Groudon':         ['Disparo Lodo', 'Filo del Abismo*'],
-    'Primal Kyogre':          ['Cascada', 'Pulso Primigenio*'],
-    'Mega Pinsir':            ['Picadura', 'Tijera X'],
+    'Primal Groudon': ['Disparo Lodo', 'Filo del Abismo*'],
+    'Primal Kyogre': ['Cascada', 'Pulso Primigenio*'],
+    'Mega Pinsir': ['Picadura', 'Tijera X'],
   };
 
   static Future<dynamic> _fetch(String ep) async {
-    final r = await http.get(Uri.parse('$_base/$ep'),
-        headers: {'Accept': 'application/json'});
+    final r = await http.get(
+      Uri.parse('$_base/$ep'),
+      headers: {'Accept': 'application/json'},
+    );
     if (r.statusCode == 200) return json.decode(r.body);
     throw Exception('HTTP ${r.statusCode} en $ep');
   }
@@ -335,7 +473,9 @@ class TierService {
     final megaName = (megaData['mega_name'] ?? '').toString().toLowerCase();
     if (baseName.isEmpty || megaName.isEmpty) return null;
 
-    var slug = baseName.replaceAll(RegExp(r"[^a-z0-9 ]"), '').replaceAll(' ', '-');
+    var slug = baseName
+        .replaceAll(RegExp(r"[^a-z0-9 ]"), '')
+        .replaceAll(' ', '-');
     if (megaName.contains('primal')) {
       slug = '$slug-primal';
     } else if (megaName.contains('origin')) {
@@ -359,38 +499,44 @@ class TierService {
   }
 
   static Future<(Map<String, List<TierEntry>>, List<TierEntry>)>
-      fetchTierData() async {
+  fetchTierData() async {
     if (_byTypeCache != null && _megaCache != null) {
       return (_byTypeCache!, _megaCache!);
     }
 
     // Carga de datos de la API
-    final statsRaw  = await _fetch('pokemon_stats.json')          as List<dynamic>;
-    final maxCpRaw  = await _fetch('pokemon_max_cp.json')         as List<dynamic>;
-    final typesRaw  = await _fetch('pokemon_types.json')          as List<dynamic>;
-    final movesRaw  = await _fetch('current_pokemon_moves.json')  as List<dynamic>;
-    final megaRaw   = await _fetch('mega_pokemon.json')           as List<dynamic>;
-    final shadowRaw = await _fetch('shadow_pokemon.json')         as Map<String, dynamic>;
-    final rarityRaw = await _fetch('pokemon_rarity.json')         as Map<String, dynamic>;
+    final statsRaw = await _fetch('pokemon_stats.json') as List<dynamic>;
+    final maxCpRaw = await _fetch('pokemon_max_cp.json') as List<dynamic>;
+    final typesRaw = await _fetch('pokemon_types.json') as List<dynamic>;
+    final movesRaw =
+        await _fetch('current_pokemon_moves.json') as List<dynamic>;
+    final megaRaw = await _fetch('mega_pokemon.json') as List<dynamic>;
+    final shadowRaw =
+        await _fetch('shadow_pokemon.json') as Map<String, dynamic>;
+    final rarityRaw =
+        await _fetch('pokemon_rarity.json') as Map<String, dynamic>;
 
     // ── Índices por nombre (insensible a mayúsculas) ──
-    final statsByName   = <String, Map<String, dynamic>>{};
-    final maxCpByName   = <String, int>{};
-    final maxCpById     = <int, int>{};
-    final typesByName   = <String, List<String>>{};
-    final movesByName   = <String, Map<String, dynamic>>{};
-    final shadowIds     = <int>{};
-    final legendaryIds  = <int>{};
-    final mythicIds     = <int>{};
+    final statsByName = <String, Map<String, dynamic>>{};
+    final maxCpByName = <String, int>{};
+    final maxCpById = <int, int>{};
+    final typesByName = <String, List<String>>{};
+    final movesByName = <String, Map<String, dynamic>>{};
+    final shadowIds = <int>{};
+    final legendaryIds = <int>{};
+    final mythicIds = <int>{};
 
     for (final s in statsRaw) {
-      final name = (s['pokemon_name'] ?? s['name'] ?? '').toString().toLowerCase();
-      if (name.isNotEmpty) statsByName[name] = Map<String, dynamic>.from(s as Map);
+      final name =
+          (s['pokemon_name'] ?? s['name'] ?? '').toString().toLowerCase();
+      if (name.isNotEmpty)
+        statsByName[name] = Map<String, dynamic>.from(s as Map);
     }
 
     for (final c in maxCpRaw) {
-      final name = (c['pokemon_name'] ?? c['name'] ?? '').toString().toLowerCase();
-      final pid  = _toInt(c['pokemon_id'] ?? c['id']);
+      final name =
+          (c['pokemon_name'] ?? c['name'] ?? '').toString().toLowerCase();
+      final pid = _toInt(c['pokemon_id'] ?? c['id']);
       if (name.isNotEmpty && c['max_cp'] != null) {
         maxCpByName[name] = _toInt(c['max_cp']);
       }
@@ -409,8 +555,9 @@ class TierService {
     }
     // Cruzar tipos con nombres via stats
     for (final s in statsRaw) {
-      final name = (s['pokemon_name'] ?? s['name'] ?? '').toString().toLowerCase();
-      final id   = _toInt(s['pokemon_id'] ?? s['id']);
+      final name =
+          (s['pokemon_name'] ?? s['name'] ?? '').toString().toLowerCase();
+      final id = _toInt(s['pokemon_id'] ?? s['id']);
       if (name.isNotEmpty && id > 0 && typesById.containsKey(id)) {
         typesByName[name] = typesById[id]!;
       }
@@ -418,7 +565,8 @@ class TierService {
 
     for (final m in movesRaw) {
       final name = (m['pokemon_name'] ?? '').toString().toLowerCase();
-      if (name.isNotEmpty) movesByName[name] = Map<String, dynamic>.from(m as Map);
+      if (name.isNotEmpty)
+        movesByName[name] = Map<String, dynamic>.from(m as Map);
     }
 
     shadowRaw.forEach((key, value) {
@@ -427,10 +575,12 @@ class TierService {
     });
 
     ((rarityRaw['Legendary'] as List?) ?? []).forEach((p) {
-      if (p is Map && p['pokemon_id'] != null) legendaryIds.add(_toInt(p['pokemon_id']));
+      if (p is Map && p['pokemon_id'] != null)
+        legendaryIds.add(_toInt(p['pokemon_id']));
     });
     ((rarityRaw['Mythic'] as List?) ?? []).forEach((p) {
-      if (p is Map && p['pokemon_id'] != null) mythicIds.add(_toInt(p['pokemon_id']));
+      if (p is Map && p['pokemon_id'] != null)
+        mythicIds.add(_toInt(p['pokemon_id']));
     });
 
     // ── Construir byType desde los nombres hardcodeados ──
@@ -443,16 +593,18 @@ class TierService {
 
       for (int i = 0; i < names.length; i++) {
         final rawName = names[i];
-        final key     = rawName.toLowerCase().trim();
+        final key = rawName.toLowerCase().trim();
 
         // Detectar si es Shadow o Mega
         final isShadowForm = key.contains('shadow');
         final isMegaForm = key.contains('mega');
-        final keyBase = key.replaceAll('shadow', '').replaceAll('mega', '').trim();
-        final displayName = rawName
-            .replaceAll(RegExp(r'\s*shadow\s*', caseSensitive: false), '')
-            .replaceAll(RegExp(r'\s*mega\s*', caseSensitive: false), '')
-            .trim();
+        final keyBase =
+            key.replaceAll('shadow', '').replaceAll('mega', '').trim();
+        final displayName =
+            rawName
+                .replaceAll(RegExp(r'\s*shadow\s*', caseSensitive: false), '')
+                .replaceAll(RegExp(r'\s*mega\s*', caseSensitive: false), '')
+                .trim();
 
         // Contar cuántas veces aparece este nombre (para diferenciar duplicados)
         final formIndex = nameCounts[keyBase] ?? 0;
@@ -464,7 +616,9 @@ class TierService {
           for (final m in megaRaw) {
             final mn = (m['mega_name'] ?? '').toString().toLowerCase();
             // Buscar coincidencias más flexibles para megas
-            final megaBaseName = mn.replaceAll('mega ', '').replaceAll('primal ', '');
+            final megaBaseName = mn
+                .replaceAll('mega ', '')
+                .replaceAll('primal ', '');
             if (mn == key ||
                 mn.contains(keyBase) ||
                 keyBase.contains(megaBaseName) ||
@@ -498,7 +652,8 @@ class TierService {
               // Primera palabra coincide
               final apiWords = apiName.split(' ');
               final keyWords = keyBase.split(' ');
-              if (keyWords.isNotEmpty && apiWords.isNotEmpty &&
+              if (keyWords.isNotEmpty &&
+                  apiWords.isNotEmpty &&
                   apiWords.first == keyWords.first) {
                 statsData = entry.value;
                 break;
@@ -516,7 +671,10 @@ class TierService {
           def = ms != null ? _toInt(ms['base_defense']) : 1;
           sta = ms != null ? _toInt(ms['base_stamina']) : 0;
         } else {
-          id = statsData != null ? _toInt(statsData['pokemon_id'] ?? statsData['id']) : 0;
+          id =
+              statsData != null
+                  ? _toInt(statsData['pokemon_id'] ?? statsData['id'])
+                  : 0;
           atk = statsData != null ? _toInt(statsData['base_attack']) : 0;
           def = statsData != null ? _toInt(statsData['base_defense']) : 1;
           sta = statsData != null ? _toInt(statsData['base_stamina']) : 0;
@@ -592,24 +750,31 @@ class TierService {
         }
 
         final hardcodedMoves = _hardcodedMoves[rawName];
-        final fasts   = hardcodedMoves != null
-          ? [hardcodedMoves[0]]
-          : (moves != null ? List<String>.from(moves['fast_moves'] ?? []) : <String>[]);
-        final charged = hardcodedMoves != null
-          ? [hardcodedMoves[1]]
-          : (moves != null ? List<String>.from(moves['charged_moves'] ?? []) : <String>[]);
+        final fasts =
+            hardcodedMoves != null
+                ? [hardcodedMoves[0]]
+                : (moves != null
+                    ? List<String>.from(moves['fast_moves'] ?? [])
+                    : <String>[]);
+        final charged =
+            hardcodedMoves != null
+                ? [hardcodedMoves[1]]
+                : (moves != null
+                    ? List<String>.from(moves['charged_moves'] ?? [])
+                    : <String>[]);
 
         final isShadow = shadowIds.contains(id) || isShadowForm;
-        
+
         // Aplicar boost de +20% ATK para shadows
         if (isShadow) {
           atk = (atk * 1.2).toInt();
         }
-        
-        final isLeg    = legendaryIds.contains(id);
-        final isMyt    = mythicIds.contains(id);
-        final isMega   = isMegaForm; // Solo marcar como mega si se especifica en el nombre
-        final rank     = entries.length + 1;
+
+        final isLeg = legendaryIds.contains(id);
+        final isMyt = mythicIds.contains(id);
+        final isMega =
+            isMegaForm; // Solo marcar como mega si se especifica en el nombre
+        final rank = entries.length + 1;
 
         developer.log(
           'Type $type rank $rank: "$displayName" (shadow=$isShadow, mega=$isMega) → id=$id atk=$atk def=$def sta=$sta cp=$cp types=$pokTypes',
@@ -663,31 +828,36 @@ class TierService {
           }
         }
 
-        entries.add(TierEntry(
-          id:          id > 0 ? id : (800 + entries.length),
-          name:        displayName,
-          types:       pokTypes,
-          baseAttack:  atk,
-          baseDefense: def,
-          baseStamina: sta,
-          maxCp:       cp,
-          score:       (10 - entries.length).toDouble(),
-          isMega:      isMega,
-          isShadow:    isShadow,
-          isLegendary: isLeg,
-          isMythic:    isMyt,
-          tier:        _assignTier(rank),
-          bestFastMove:    fasts.isNotEmpty ? fasts.first : null,
-          bestChargedMove: charged.isNotEmpty ? charged.first : null,
-          formIndex:   formIndex,
-          imageUrlOverride: isMega ? _resolveMegaArtworkUrl(megaData) : null,
-        ));
+        entries.add(
+          TierEntry(
+            id: id > 0 ? id : (800 + entries.length),
+            name: displayName,
+            types: pokTypes,
+            baseAttack: atk,
+            baseDefense: def,
+            baseStamina: sta,
+            maxCp: cp,
+            score: (10 - entries.length).toDouble(),
+            isMega: isMega,
+            isShadow: isShadow,
+            isLegendary: isLeg,
+            isMythic: isMyt,
+            tier: _assignTier(rank),
+            bestFastMove: fasts.isNotEmpty ? fasts.first : null,
+            bestChargedMove: charged.isNotEmpty ? charged.first : null,
+            formIndex: formIndex,
+            imageUrlOverride: isMega ? _resolveMegaArtworkUrl(megaData) : null,
+          ),
+        );
       }
 
       if (entries.isNotEmpty) byTypeFinal[type] = entries;
     });
 
-    developer.log('Types built: ${byTypeFinal.keys.toList()}', name: 'TierService');
+    developer.log(
+      'Types built: ${byTypeFinal.keys.toList()}',
+      name: 'TierService',
+    );
 
     // ── Construir megas desde nombres hardcodeados ──
     final megaFinal = <TierEntry>[];
@@ -701,8 +871,12 @@ class TierService {
         final mn = (m['mega_name'] ?? '').toString().toLowerCase();
         final keyLower = key.toLowerCase();
         // Búsqueda más flexible para megas
-        final megaBaseName = mn.replaceAll('mega ', '').replaceAll('primal ', '');
-        final keyBaseName = keyLower.replaceAll('mega ', '').replaceAll('primal ', '');
+        final megaBaseName = mn
+            .replaceAll('mega ', '')
+            .replaceAll('primal ', '');
+        final keyBaseName = keyLower
+            .replaceAll('mega ', '')
+            .replaceAll('primal ', '');
         if (mn == keyLower ||
             mn.contains(keyBaseName) ||
             keyBaseName.contains(megaBaseName) ||
@@ -728,50 +902,64 @@ class TierService {
         }
       }
 
-      final moves   = pid > 0 ? movesByName.entries
-          .where((e) {
-            final s = statsRaw.firstWhere(
-              (x) => _toInt(x['pokemon_id'] ?? x['id']) == pid,
-              orElse: () => <String, dynamic>{},
-            );
-            return (s['pokemon_name'] ?? s['name'] ?? '').toString().toLowerCase() == e.key;
-          })
-          .map((e) => e.value)
-          .firstOrNull : null;
+      final moves =
+          pid > 0
+              ? movesByName.entries
+                  .where((e) {
+                    final s = statsRaw.firstWhere(
+                      (x) => _toInt(x['pokemon_id'] ?? x['id']) == pid,
+                      orElse: () => <String, dynamic>{},
+                    );
+                    return (s['pokemon_name'] ?? s['name'] ?? '')
+                            .toString()
+                            .toLowerCase() ==
+                        e.key;
+                  })
+                  .map((e) => e.value)
+                  .firstOrNull
+              : null;
 
       final hardcodedMegaMoves = _hardcodedMoves[megaName];
-      final fasts   = hardcodedMegaMoves != null
-        ? [hardcodedMegaMoves[0]]
-        : (moves != null ? List<String>.from(moves['fast_moves'] ?? []) : <String>[]);
-      final charged = hardcodedMegaMoves != null
-        ? [hardcodedMegaMoves[1]]
-        : (moves != null ? List<String>.from(moves['charged_moves'] ?? []) : <String>[]);
+      final fasts =
+          hardcodedMegaMoves != null
+              ? [hardcodedMegaMoves[0]]
+              : (moves != null
+                  ? List<String>.from(moves['fast_moves'] ?? [])
+                  : <String>[]);
+      final charged =
+          hardcodedMegaMoves != null
+              ? [hardcodedMegaMoves[1]]
+              : (moves != null
+                  ? List<String>.from(moves['charged_moves'] ?? [])
+                  : <String>[]);
 
-      megaFinal.add(TierEntry(
-        id:          pid > 0 ? pid : (900 + megaFinal.length),
-        name:        megaName,
-        types:       megaTypes,
-        baseAttack:  atk,
-        baseDefense: def,
-        baseStamina: sta,
-        maxCp:       _calculateMaxCp(atk, def, sta),
-        score:       (atk * atk * sta.toDouble()) / def,
-        isMega:      true,
-        isShadow:    false,
-        isLegendary: false,
-        isMythic:    false,
-        tier:        'S',
-        bestFastMove:    fasts.isNotEmpty ? fasts.first : null,
-        bestChargedMove: charged.isNotEmpty ? charged.first : null,
-        imageUrlOverride: _resolveMegaArtworkUrl(megaData),
-        tierType:    type,
-      ));
+      megaFinal.add(
+        TierEntry(
+          id: pid > 0 ? pid : (900 + megaFinal.length),
+          name: megaName,
+          types: megaTypes,
+          baseAttack: atk,
+          baseDefense: def,
+          baseStamina: sta,
+          maxCp: _calculateMaxCp(atk, def, sta),
+          score: (atk * atk * sta.toDouble()) / def,
+          isMega: true,
+          isShadow: false,
+          isLegendary: false,
+          isMythic: false,
+          tier: 'S',
+          bestFastMove: fasts.isNotEmpty ? fasts.first : null,
+          bestChargedMove: charged.isNotEmpty ? charged.first : null,
+          imageUrlOverride: _resolveMegaArtworkUrl(megaData),
+          tierType: type,
+        ),
+      );
     });
 
     megaFinal.sort((a, b) => b.score.compareTo(a.score));
 
     _byTypeCache = byTypeFinal;
-    _megaCache   = megaFinal;
+    _megaCache = megaFinal;
     return (byTypeFinal, megaFinal);
   }
 }

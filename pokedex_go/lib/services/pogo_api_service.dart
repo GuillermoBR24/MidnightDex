@@ -69,6 +69,13 @@ class PogoApiService {
     return _getList(ep);
   }
 
+  static int? _toInt(dynamic value) {
+    if (value == null) return null;
+    if (value is int) return value;
+    if (value is double) return value.toInt();
+    return int.tryParse(value.toString());
+  }
+
   static Future<List<Pokemon>> fetchAllPokemon() async {
     // Carga Maps en paralelo
     final maps = await Future.wait([
@@ -121,9 +128,14 @@ class PogoApiService {
     _pvpExclusive  = lists[6];
     _baby          = lists[7];
 
-    // ── Mapas de acceso rápido por ID ──
-    final statsById = <String, dynamic>{};
-    for (final s in _stats!) statsById[s['id'].toString()] = s;
+    // ── Mapas de acceso rápido por ID ──final statsByName = <String, Map<String, dynamic>>{};
+    final statsByName = <String, Map<String, dynamic>>{};
+    for (final s in _stats!) {
+      final name = (s['pokemon_name'] ?? s['name'] ?? '').toString().toLowerCase();
+      if (name.isNotEmpty) {
+        statsByName[name] = Map<String, dynamic>.from(s as Map);
+      }
+    }
 
     final maxCpById = <String, dynamic>{};
     for (final c in _maxCp!) maxCpById[c['id'].toString()] = c;
@@ -197,20 +209,33 @@ class PogoApiService {
       final id  = data['id'] as int;
       final sid = id.toString();
 
-      final stats = statsById[sid];
-      final maxCp = maxCpById[sid];
+      final pokemonName = data['name']?.toString().toLowerCase() ?? '';
+      final stats = statsByName[pokemonName];
+      final maxCpEntry = maxCpById[id];
       final hw    = hwById[sid];
       final moves = movesById[sid];
       final evos  = evoById[sid] ?? [];
 
+/*
+      developer.log(
+        'Pokemon $pokemonName (ID: $id) - Stats: ${stats != null ? "FOUND" : "NOT FOUND"}',
+        name: 'PogoApiService',
+      );
+      if (stats != null) {
+        developer.log(
+          '  ATK: ${stats['base_attack']}, DEF: ${stats['base_defense']}, STA: ${stats['base_stamina']}',
+          name: 'PogoApiService',
+        );
+      }
+*/
       result.add(Pokemon(
         id:   id,
         name: data['name'] as String,
         types: typesById[sid] ?? ['Normal'],
-        maxCp:       maxCp?['max_cp'] as int?,
-        baseAttack:  stats != null ? int.tryParse(stats['base_attack'].toString()) : null,
-        baseDefense: stats != null ? int.tryParse(stats['base_defense'].toString()) : null,
-        baseStamina: stats != null ? int.tryParse(stats['base_stamina'].toString()) : null,
+        maxCp:       maxCpEntry,
+        baseAttack:  stats != null ? _toInt(stats['base_attack']) : null,
+        baseDefense: stats != null ? _toInt(stats['base_defense']) : null,
+        baseStamina: stats != null ? _toInt(stats['base_stamina']) : null,
         isShiny:    _shiny!.containsKey(sid) || _shiny!.containsKey(id),
         isReleased: _released!.containsKey(sid) || _released!.containsKey(id),
         isNesting:  _nesting!.containsKey(sid) || _nesting!.containsKey(id),

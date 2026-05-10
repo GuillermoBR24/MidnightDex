@@ -5,6 +5,7 @@ import '../models/pokemon.dart';
 import '../theme/app_theme.dart';
 import '../widgets/type_badge.dart';
 import '../widgets/stat_bar.dart';
+import 'dart:math';
 
 class PokemonDetailScreen extends StatelessWidget {
   final Pokemon pokemon;
@@ -167,21 +168,79 @@ class _UnreleasedView extends StatelessWidget {
 // ──────────────────────────────────────────────
 // Vista cuando el Pokémon SÍ está en el juego
 // ──────────────────────────────────────────────
-class _ReleasedView extends StatelessWidget {
+class _ReleasedView extends StatefulWidget {
   final Pokemon pokemon;
   const _ReleasedView({required this.pokemon});
 
   @override
-  Widget build(BuildContext context) {
-    final primary = pokemon.types.isNotEmpty
-        ? AppTheme.getTypeColor(pokemon.types.first)
+  State<_ReleasedView> createState() => _ReleasedViewState();
+}
+
+
+class _ReleasedViewState extends State<_ReleasedView> {
+  bool _showShiny = false;
+
+  void _toggleShiny() {
+    if (widget.pokemon.possibleShiny == true) {
+      setState(() => _showShiny = !_showShiny);
+    }
+  }
+    /// Calcula CP para un nivel específico
+  int _calculateCpAtLevel(int level) {
+    final attack = widget.pokemon.baseAttack;
+    final defense = widget.pokemon.baseDefense;
+    final stamina = widget.pokemon.baseStamina;
+    
+    if (attack == null || defense == null || stamina == null) return 0;
+    
+    // Tabla simplificada de CPM
+    final cpm = _getCpmForLevel(level);
+    
+    final cp = (attack * 
+               sqrt(defense.toDouble()) * 
+               sqrt(stamina.toDouble()) * 
+               cpm * cpm) / 10;
+    
+    return cp.floor();
+  }
+
+  /// Obtiene el CPM (CP Multiplier) para un nivel dado
+  double _getCpmForLevel(int level) {
+    // Valores oficiales de CPM
+    const cpmTable = {
+      40: 0.79030001,
+      41: 0.79530001,
+      42: 0.80030000,
+      43: 0.80530000,
+      44: 0.81030000,
+      45: 0.81530000,
+      46: 0.82030000,
+      47: 0.82530000,
+      48: 0.83030000,
+      49: 0.83530000,
+    };
+    
+    return cpmTable[level] ?? 0.79030001; // Default a nivel 40
+  }
+
+  String get _currentImageUrl {
+    if (!_showShiny || widget.pokemon.possibleShiny != true) {
+      return widget.pokemon.imageUrl;
+    }
+    return widget.pokemon.shinyImageUrl;
+  }
+
+  @override
+  Widget build(BuildContext context) {  // 👇 AQUÍ va TODO el build
+    final primary = widget.pokemon.types.isNotEmpty
+        ? AppTheme.getTypeColor(widget.pokemon.types.first)
         : AppTheme.accentBlue;
 
     return Scaffold(
       backgroundColor: AppTheme.bgDark,
       body: CustomScrollView(
         slivers: [
-          // ─── AppBar ───
+          // ─── AppBar con imagen toggleable ───
           SliverAppBar(
             expandedHeight: 300,
             pinned: true,
@@ -190,11 +249,37 @@ class _ReleasedView extends StatelessWidget {
               icon: const Icon(Icons.arrow_back_ios_new, color: AppTheme.accentBlue),
               onPressed: () => Navigator.pop(context),
             ),
+            actions: [
+              if (widget.pokemon.possibleShiny == true)
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  child: IconButton(
+                    key: ValueKey<bool>(_showShiny),
+                    icon: Icon(
+                      Icons.auto_awesome,
+                      color: _showShiny 
+                          ? const Color(0xFFFFD700)
+                          : AppTheme.textSecond,
+                      size: 26,
+                      shadows: _showShiny
+                          ? [
+                              Shadow(
+                                color: const Color(0xFFFFD700).withOpacity(0.6),
+                                blurRadius: 10,
+                              )
+                            ]
+                          : [],
+                    ),
+                    tooltip: _showShiny ? 'Ver normal' : 'Ver shiny',
+                    onPressed: _toggleShiny,
+                  ),
+                ),
+              const SizedBox(width: 8),
+            ],
             flexibleSpace: FlexibleSpaceBar(
               background: Stack(
                 alignment: Alignment.center,
                 children: [
-                  // Anillo decorativo
                   Container(
                     width: 230,
                     height: 230,
@@ -205,26 +290,44 @@ class _ReleasedView extends StatelessWidget {
                           color: primary.withOpacity(0.15), width: 2),
                     ),
                   ),
-                  CachedNetworkImage(
-                    imageUrl: pokemon.imageUrl,
-                    height: 210,
-                    fit: BoxFit.contain,
-                  ).animate().fadeIn(duration: 500.ms).scale(
-                      begin: const Offset(0.8, 0.8)),
-                  // Badges de rareza sobre la imagen
-                  if (pokemon.isLegendary || pokemon.isMythic)
+                  
+                  // 👇 IMAGEN CON TOGGLE
+                  GestureDetector(
+                    onTap: widget.pokemon.possibleShiny == true ? _toggleShiny : null,
+                    child: CachedNetworkImage(
+                      imageUrl: _currentImageUrl,
+                      height: 210,
+                      fit: BoxFit.contain,
+                      errorWidget: (_, __, ___) {
+                        if (_showShiny && widget.pokemon.possibleShiny == true) {
+                          return CachedNetworkImage(
+                            imageUrl: widget.pokemon.shinyImageUrlFallback,
+                            height: 210,
+                            fit: BoxFit.contain,
+                            errorWidget: (_, __, ___) => 
+                                _buildPlaceholderImage(primary),
+                          );
+                        }
+                        return _buildPlaceholderImage(primary);
+                      },
+                    ).animate().fadeIn(duration: 500.ms).scale(
+                        begin: const Offset(0.8, 0.8)),
+                  ),
+                  
+                  // Badges de rareza
+                  if (widget.pokemon.isLegendary || widget.pokemon.isMythic)
                     Positioned(
                       bottom: 30,
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 14, vertical: 5),
                         decoration: BoxDecoration(
-                          color: pokemon.isMythic
+                          color: widget.pokemon.isMythic
                               ? const Color(0xFF2D1A3E)
                               : const Color(0xFF1A2A1A),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: pokemon.isMythic
+                            color: widget.pokemon.isMythic
                                 ? const Color(0xFFA855F7)
                                 : const Color(0xFFFFD700),
                             width: 1,
@@ -234,19 +337,19 @@ class _ReleasedView extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
-                              pokemon.isMythic
+                              widget.pokemon.isMythic
                                   ? Icons.auto_awesome
                                   : Icons.star,
-                              color: pokemon.isMythic
+                              color: widget.pokemon.isMythic
                                   ? const Color(0xFFA855F7)
                                   : const Color(0xFFFFD700),
                               size: 12,
                             ),
                             const SizedBox(width: 5),
                             Text(
-                              pokemon.isMythic ? 'Mythic' : 'Legendary',
+                              widget.pokemon.isMythic ? 'Mythic' : 'Legendary',
                               style: TextStyle(
-                                color: pokemon.isMythic
+                                color: widget.pokemon.isMythic
                                     ? const Color(0xFFA855F7)
                                     : const Color(0xFFFFD700),
                                 fontSize: 11,
@@ -262,27 +365,25 @@ class _ReleasedView extends StatelessWidget {
             ),
           ),
 
-          // ─── Contenido ───
+          // ─── CONTENIDO PRINCIPAL (esto es lo que te faltaba) ───
           SliverToBoxAdapter(
             child: Container(
               decoration: const BoxDecoration(
                 color: AppTheme.bgCard,
-                borderRadius:
-                    BorderRadius.vertical(top: Radius.circular(28)),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-
                     // Nombre y número
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
                           child: Text(
-                            pokemon.name,
+                            widget.pokemon.name,  // 👈 Usa widget.pokemon
                             style: const TextStyle(
                               color: AppTheme.textPrimary,
                               fontSize: 28,
@@ -291,7 +392,7 @@ class _ReleasedView extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          '#${pokemon.paddedId}',
+                          '#${widget.pokemon.paddedId}',
                           style: TextStyle(
                             color: primary,
                             fontSize: 20,
@@ -303,9 +404,9 @@ class _ReleasedView extends StatelessWidget {
                     const SizedBox(height: 4),
 
                     // Generación
-                    if (pokemon.generation != null)
+                    if (widget.pokemon.generation != null)
                       Text(
-                        pokemon.generation!,
+                        widget.pokemon.generation!,
                         style: const TextStyle(
                           color: AppTheme.textSecond,
                           fontSize: 12,
@@ -318,18 +419,18 @@ class _ReleasedView extends StatelessWidget {
                     // Tipos
                     Wrap(
                       spacing: 8,
-                      children: pokemon.types
+                      children: widget.pokemon.types
                           .map((t) => TypeBadge(type: t))
                           .toList(),
                     ),
                     const SizedBox(height: 16),
 
                     // Badges de características
-                    _BadgesRow(pokemon: pokemon),
+                    _BadgesRow(pokemon: widget.pokemon),
                     const SizedBox(height: 24),
 
-                    // ── Sección: Dimensiones físicas ──
-                    if (pokemon.pokedexHeightM != null) ...[
+                    // ── Dimensiones físicas ──
+                    if (widget.pokemon.pokedexHeightM != null) ...[
                       _SectionTitle(title: 'Dimensiones'),
                       const SizedBox(height: 10),
                       Row(
@@ -338,8 +439,7 @@ class _ReleasedView extends StatelessWidget {
                             child: _InfoTile(
                               icon: Icons.height,
                               label: 'Altura',
-                              value:
-                                  '${pokemon.pokedexHeightM!.toStringAsFixed(1)} m',
+                              value: '${widget.pokemon.pokedexHeightM!.toStringAsFixed(1)} m',
                               color: primary,
                             ),
                           ),
@@ -348,8 +448,7 @@ class _ReleasedView extends StatelessWidget {
                             child: _InfoTile(
                               icon: Icons.monitor_weight_outlined,
                               label: 'Peso',
-                              value:
-                                  '${pokemon.pokedexWeightKg!.toStringAsFixed(1)} kg',
+                              value: '${widget.pokemon.pokedexWeightKg!.toStringAsFixed(1)} kg',
                               color: primary,
                             ),
                           ),
@@ -358,109 +457,142 @@ class _ReleasedView extends StatelessWidget {
                       const SizedBox(height: 20),
                     ],
 
-                    // ── Sección: Combat Power ──
-                    if (pokemon.maxCp != null) ...[
-                      _SectionTitle(title: 'Combat Power'),
-                      const SizedBox(height: 10),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 14),
-                        decoration: BoxDecoration(
-                          color: AppTheme.bgSurface,
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(
-                              color: primary.withOpacity(0.35), width: 1.5),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.bolt, color: primary, size: 22),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Max CP ${pokemon.maxCp}',
-                              style: TextStyle(
-                                color: primary,
-                                fontSize: 22,
-                                fontWeight: FontWeight.w800,
+                    // ── Combat Power ──
+                    _SectionTitle(title: 'Combat Power'),
+                    const SizedBox(height: 10),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                      decoration: BoxDecoration(
+                        color: AppTheme.bgSurface,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                            color: primary.withOpacity(0.35), width: 1.5),
+                      ),
+                      child: Column(
+                        children: [
+                          // CP Principal (Nivel 50)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.bolt, color: primary, size: 22),
+                              const SizedBox(width: 8),
+                              Text(
+                                '${widget.pokemon.calculatedMaxCp} CP',
+                                style: TextStyle(
+                                  color: primary,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: Colors.green.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(4),
+                                  border: Border.all(color: Colors.green, width: 1),
+                                ),
+                                child: const Text(
+                                  '100% IV',
+                                  style: TextStyle(
+                                    color: Colors.green,
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          
+                          // CP Nivel 40 (opcional)
+                          if (widget.pokemon.baseAttack != null)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 6),
+                              child: Text(
+                                'Nvl 40: ${_calculateCpAtLevel(40)} CP',
+                                style: const TextStyle(
+                                  color: AppTheme.textSecond,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
-                          ],
-                        ),
+                        ],
                       ),
-                      const SizedBox(height: 20),
-                    ],
+                    ),
+                    const SizedBox(height: 20),
 
-                    // ── Sección: Stats base ──
-                    if (pokemon.baseAttack != null) ...[
+                    // ── Stats base ──
+                    if (widget.pokemon.baseAttack != null) ...[
                       _SectionTitle(title: 'Stats base'),
                       const SizedBox(height: 10),
                       StatBar(
                         label: 'Ataque',
-                        value: pokemon.baseAttack!,
+                        value: widget.pokemon.baseAttack!,
                         maxValue: 350,
                         color: const Color(0xFFFF6B35),
                       ),
                       StatBar(
                         label: 'Defensa',
-                        value: pokemon.baseDefense!,
+                        value: widget.pokemon.baseDefense!,
                         maxValue: 350,
                         color: const Color(0xFF2196F3),
                       ),
                       StatBar(
                         label: 'Stamina',
-                        value: pokemon.baseStamina!,
+                        value: widget.pokemon.baseStamina!,
                         maxValue: 500,
                         color: const Color(0xFF4CAF50),
                       ),
                       const SizedBox(height: 20),
                     ],
 
-                    // ── Sección: Info de juego ──
+                    // ── Info de juego ──
                     _SectionTitle(title: 'Información de juego'),
                     const SizedBox(height: 10),
                     Row(
                       children: [
-                        if (pokemon.buddyDistanceKm != null)
+                        if (widget.pokemon.buddyDistanceKm != null)
                           Expanded(
                             child: _InfoTile(
                               icon: Icons.directions_walk,
                               label: 'Buddy km',
-                              value: '${pokemon.buddyDistanceKm} km',
+                              value: '${widget.pokemon.buddyDistanceKm} km',
                               color: const Color(0xFF00B4FF),
                             ),
                           ),
-                        if (pokemon.buddyDistanceKm != null &&
-                            pokemon.candyToEvolve != null)
+                        if (widget.pokemon.buddyDistanceKm != null &&
+                            widget.pokemon.candyToEvolve != null)
                           const SizedBox(width: 12),
-                        if (pokemon.candyToEvolve != null)
+                        if (widget.pokemon.candyToEvolve != null)
                           Expanded(
                             child: _InfoTile(
                               icon: Icons.fiber_manual_record,
                               label: 'Candy evolución',
-                              value: '${pokemon.candyToEvolve}',
+                              value: '${widget.pokemon.candyToEvolve}',
                               color: const Color(0xFFFF69B4),
                             ),
                           ),
                       ],
                     ),
                     const SizedBox(height: 12),
-                    if (pokemon.raidLevel != null)
+                    if (widget.pokemon.raidLevel != null)
                       _InfoTile(
                         icon: Icons.shield,
                         label: 'Nivel de Raid',
-                        value: 'Tier ${pokemon.raidLevel}',
+                        value: 'Tier ${widget.pokemon.raidLevel}',
                         color: const Color(0xFFFFD700),
                         full: true,
                       ),
                     const SizedBox(height: 20),
 
-                    // ── Sección: Movimientos ──
-                    if (pokemon.fastMoves.isNotEmpty ||
-                        pokemon.chargedMoves.isNotEmpty) ...[
+                    // ── Movimientos ──
+                    if (widget.pokemon.fastMoves.isNotEmpty ||
+                        widget.pokemon.chargedMoves.isNotEmpty) ...[
                       _SectionTitle(title: 'Movimientos'),
                       const SizedBox(height: 10),
 
-                      if (pokemon.fastMoves.isNotEmpty) ...[
+                      if (widget.pokemon.fastMoves.isNotEmpty) ...[
                         const Text(
                           'RÁPIDOS',
                           style: TextStyle(
@@ -475,10 +607,10 @@ class _ReleasedView extends StatelessWidget {
                           spacing: 6,
                           runSpacing: 6,
                           children: [
-                            ...pokemon.fastMoves
+                            ...widget.pokemon.fastMoves
                                 .map((m) => _MoveBadge(
                                     name: m, color: const Color(0xFF00B4FF))),
-                            ...pokemon.eliteFastMoves
+                            ...widget.pokemon.eliteFastMoves
                                 .map((m) => _MoveBadge(
                                     name: m,
                                     color: const Color(0xFFFFD700),
@@ -488,7 +620,7 @@ class _ReleasedView extends StatelessWidget {
                         const SizedBox(height: 12),
                       ],
 
-                      if (pokemon.chargedMoves.isNotEmpty) ...[
+                      if (widget.pokemon.chargedMoves.isNotEmpty) ...[
                         const Text(
                           'CARGADOS',
                           style: TextStyle(
@@ -503,11 +635,11 @@ class _ReleasedView extends StatelessWidget {
                           spacing: 6,
                           runSpacing: 6,
                           children: [
-                            ...pokemon.chargedMoves
+                            ...widget.pokemon.chargedMoves
                                 .map((m) => _MoveBadge(
                                     name: m,
                                     color: const Color(0xFFFF6B35))),
-                            ...pokemon.eliteChargedMoves
+                            ...widget.pokemon.eliteChargedMoves
                                 .map((m) => _MoveBadge(
                                     name: m,
                                     color: const Color(0xFFA855F7),
@@ -518,11 +650,11 @@ class _ReleasedView extends StatelessWidget {
                       ],
                     ],
 
-                    // ── Sección: Evoluciones ──
-                    if (pokemon.evolutions.isNotEmpty) ...[
+                    // ── Evoluciones ──
+                    if (widget.pokemon.evolutions.isNotEmpty) ...[
                       _SectionTitle(title: 'Evoluciones'),
                       const SizedBox(height: 10),
-                      ...pokemon.evolutions.map(
+                      ...widget.pokemon.evolutions.map(
                         (evo) => _EvoTile(
                           evo: evo,
                           primaryColor: primary,
@@ -538,6 +670,32 @@ class _ReleasedView extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+  void initState() {
+    super.initState();
+    print('=== DEBUG ${widget.pokemon.name} ===');
+    print('maxCp: ${widget.pokemon.maxCp}');
+    print('baseAttack: ${widget.pokemon.baseAttack}');
+    print('baseDefense: ${widget.pokemon.baseDefense}');
+    print('baseStamina: ${widget.pokemon.baseStamina}');
+    print('calculatedMaxCp: ${widget.pokemon.calculatedMaxCp}');
+    print('=============================');
+  }
+
+  // Widget helper para placeholder
+  Widget _buildPlaceholderImage(Color primary) {
+    return Container(
+      height: 210,
+      decoration: BoxDecoration(
+        color: primary.withOpacity(0.1),
+        shape: BoxShape.circle,
+      ),
+      child: Icon(
+        Icons.catching_pokemon,
+        color: primary.withOpacity(0.3),
+        size: 48,
       ),
     );
   }

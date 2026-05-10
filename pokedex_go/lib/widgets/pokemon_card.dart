@@ -23,10 +23,14 @@ class PokemonCard extends StatelessWidget {
 
     return GestureDetector(
       onTap: onTap,
-      child: Stack(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+        return Stack(
         children: [
           // Tarjeta base
           Container(
+            width: constraints.maxWidth,   // 👇 Fuerza ancho completo
+            height: constraints.maxHeight,
             decoration: BoxDecoration(
               color: released ? AppTheme.bgCard : const Color(0xFF0D0D14),
               borderRadius: BorderRadius.circular(16),
@@ -50,7 +54,8 @@ class PokemonCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 // Imagen (desaturada si no está introducido)
-                Expanded(
+                AspectRatio(
+                  aspectRatio: 1.2,  // 👇 Proporción fija para la imagen
                   child: Padding(
                     padding: const EdgeInsets.all(8),
                     child: ColorFiltered(
@@ -204,7 +209,8 @@ class PokemonCard extends StatelessWidget {
               ),
             ),
         ],
-      ),
+      );
+      }),
     ).animate().fadeIn(duration: 300.ms).scale(
         begin: const Offset(0.95, 0.95));
   }

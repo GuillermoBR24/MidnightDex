@@ -1,3 +1,5 @@
+import 'dart:math';
+
 class Pokemon {
   final int id;
   final String name;
@@ -66,11 +68,70 @@ class Pokemon {
   String get imageUrl =>
       'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/$id.png';
 
+  String get shinyImageUrl =>
+      'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/shiny/$id.png';
+      
+  String get shinyImageUrlFallback =>
+      'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/$id.png';
+
   String get paddedId => id.toString().padLeft(3, '0');
 
   String get rarity {
     if (isMythic) return 'Mythic';
     if (isLegendary) return 'Legendary';
     return 'Standard';
+  }
+
+  int get calculatedMaxCp {
+    if (baseAttack == null || baseDefense == null || baseStamina == null) {
+      return maxCp ?? 0; 
+    }
+    
+    // Si la API ya trae un maxCp válido, úsalo como referencia
+    final apiCp = maxCp;
+    
+    // 👇 CPM para nivel 50 (máximo en Pokémon GO)
+    const cpm = 0.84029999;
+    
+    // 👇 Stats con IVs máximos (100% perfect)
+    final attack = baseAttack! + 15;   // +15 IV Attack
+    final defense = baseDefense! + 15; // +15 IV Defense  
+    final stamina = baseStamina! + 15; // +15 IV Stamina
+    
+    if (attack <= 0 || defense <= 0 || stamina <= 0) return 0;
+    
+    // Fórmula oficial de Pokémon GO
+    final cp = (attack * 
+               sqrt(defense.toDouble()) * 
+               sqrt(stamina.toDouble()) * 
+               cpm * cpm) / 10;
+    
+    final calculatedValue = cp.floor();
+    final finalValue = calculatedValue < 10 ? 10 : calculatedValue;
+    
+    // Retorna el mayor entre el calculado y el de API (por seguridad)
+    return apiCp != null && apiCp > finalValue ? apiCp : finalValue;
+  }
+
+  int calculateCpWithIvs({
+    required int attackIv,   // 0-15
+    required int defenseIv,  // 0-15
+    required int staminaIv,  // 0-15
+    double cpm = 0.84029999, // Nivel 50 por defecto
+  }) {
+    if (baseAttack == null || baseDefense == null || baseStamina == null) {
+      return 0;
+    }
+    
+    final attack = baseAttack! + attackIv.clamp(0, 15);
+    final defense = baseDefense! + defenseIv.clamp(0, 15);
+    final stamina = baseStamina! + staminaIv.clamp(0, 15);
+    
+    final cp = (attack * 
+              sqrt(defense.toDouble()) * 
+              sqrt(stamina.toDouble()) * 
+              cpm * cpm) / 10;
+    
+    return cp.floor().clamp(10, 9999);
   }
 }

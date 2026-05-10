@@ -171,23 +171,40 @@ class _PokedexScreenState extends State<PokedexScreen> {
         // Grid
         Expanded(
           child: GridView.builder(
-            padding: const EdgeInsets.fromLTRB(12, 4, 12, 20),
+            padding: const EdgeInsets.fromLTRB(8, 4, 8, 20),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.78,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
+              crossAxisCount: 3,
+              childAspectRatio: 0.60,
+              crossAxisSpacing: 8,
+              mainAxisSpacing: 8,
             ),
             itemCount: _filtered.length,
-            itemBuilder: (_, i) => PokemonCard(
-              pokemon: _filtered[i],
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => PokemonDetailScreen(pokemon: _filtered[i]),
+            addAutomaticKeepAlives: true,  // 👈 Mantiene el estado
+            addRepaintBoundaries: true,     // 👈 Optimiza renderizado
+            itemBuilder: (context, index) {
+              // 👇 Calcula el ancho disponible para 3 columnas
+              final screenWidth = MediaQuery.of(context).size.width;
+              final padding = 16.0; // 8px left + 8px right
+              final spacing = 8.0;  // crossAxisSpacing
+              final cellWidth = (screenWidth - padding - (2 * spacing)) / 3;
+              final cellHeight = cellWidth / 0.75; // childAspectRatio
+
+              return SizedBox(
+                width: cellWidth,
+                height: cellHeight,
+                child: PokemonCard(
+                  pokemon: _filtered[index],
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => PokemonDetailScreen(
+                        pokemon: _filtered[index],
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
         ),
       ],

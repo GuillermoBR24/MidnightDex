@@ -383,16 +383,25 @@ class _TierCard extends StatelessWidget {
           SizedBox(
             width: 52,
             height: 52,
-            child: CachedNetworkImage(
-              imageUrl: entry.imageUrl,
-              fit: BoxFit.contain,
-              errorWidget:
-                  (_, __, ___) => Icon(
-                    Icons.catching_pokemon,
-                    color: primary.withOpacity(0.3),
-                    size: 32,
+            child: entry.isMega
+                ? Image.asset(  // 👇 Para Megas: usa asset local
+                    entry.imageUrl,
+                    fit: BoxFit.contain,
+                    errorBuilder: (_, __, ___) => Icon(
+                      Icons.auto_awesome,  // ✨ Icono de Mega si falla
+                      color: primary.withOpacity(0.3),
+                      size: 32,
+                    ),
+                  )
+                : CachedNetworkImage(  // 👇 Para normales: usa URL
+                    imageUrl: entry.imageUrl,
+                    fit: BoxFit.contain,
+                    errorWidget: (_, __, ___) => Icon(
+                      Icons.catching_pokemon,
+                      color: primary.withOpacity(0.3),
+                      size: 32,
+                    ),
                   ),
-            ),
           ),
           const SizedBox(width: 10),
 

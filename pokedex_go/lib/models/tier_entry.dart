@@ -42,9 +42,28 @@ class TierEntry {
   });
 
   String get imageUrl {
+    // 👇 Si es Mega, usar asset local primero
+    if (isMega) {
+      // Detectar si es forma X o Y para Charizard/Mewtwo
+      final nameLower = name.toLowerCase();
+      String formSuffix = '';
+      
+      if ((id == 6 || id == 150)) {  // Charizard o Mewtwo
+        if (nameLower.contains(' x')) {
+          formSuffix = '_x';
+        } else if (nameLower.contains(' y')) {
+          formSuffix = '_y';
+        }
+      }
+      
+      return 'megas/$id$formSuffix.png';
+    }
+    
+    // Para no-Mega, usar imageUrlOverride si existe (web) o URL por defecto
     if (!kIsWeb && imageUrlOverride != null && imageUrlOverride!.isNotEmpty) {
       return imageUrlOverride!;
     }
+    
     return 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/$id.png';
   }
 

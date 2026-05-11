@@ -231,7 +231,7 @@ class TierService {
     'Fairy': 'Mega Gardevoir',
     'Fighting': 'Mega Lucario',
     'Fire': 'Mega Blaziken',
-    'Flying': 'Mega Rayquaza',
+    'Flying': 'Mega Rayquaza Flying',
     'Ghost': 'Mega Gengar',
     'Grass': 'Mega Sceptile',
     'Ground': 'Primal Groudon',
@@ -239,7 +239,7 @@ class TierService {
     'Poison': 'Mega Beedrill',
     'Psychic': 'Mega Alakazam',
     'Rock': 'Mega Diancie',
-    'Steel': 'Mega Lucario',
+    'Steel': 'Mega Lucario Steel',
     'Water': 'Primal Kyogre',
   };
 
@@ -920,18 +920,20 @@ class TierService {
               : null;
 
       final hardcodedMegaMoves = _hardcodedMoves[megaName];
-      final fasts =
-          hardcodedMegaMoves != null
-              ? [hardcodedMegaMoves[0]]
-              : (moves != null
-                  ? List<String>.from(moves['fast_moves'] ?? [])
-                  : <String>[]);
-      final charged =
-          hardcodedMegaMoves != null
-              ? [hardcodedMegaMoves[1]]
-              : (moves != null
-                  ? List<String>.from(moves['charged_moves'] ?? [])
-                  : <String>[]);
+
+      final fasts = hardcodedMegaMoves != null && hardcodedMegaMoves.isNotEmpty
+          ? [hardcodedMegaMoves[0]]
+          : <String>[];
+      final charged = hardcodedMegaMoves != null && hardcodedMegaMoves.length > 1
+          ? [hardcodedMegaMoves[1]]
+          : <String>[];
+
+      if (hardcodedMegaMoves != null) {
+        developer.log(
+          'Mega $megaName → Moves: ${fasts.isNotEmpty ? fasts.first : '-'} / ${charged.isNotEmpty ? charged.first : '-'}',
+          name: 'TierService',
+        );
+      }
 
       megaFinal.add(
         TierEntry(

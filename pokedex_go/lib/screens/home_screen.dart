@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:pokedex_go/screens/news_screen.dart';
 import '../theme/app_theme.dart';
 import 'pokedex_screen.dart';
 import 'tier_screen.dart';
@@ -55,35 +56,49 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ).animate().fadeIn(duration: 600.ms).slideX(begin: -0.2),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: Chip(
-              label: Text(
-                _currentIndex == 0 ? 'PoGoAPI' : 'TIER LIST',
-                style: TextStyle(
-                  color:
-                      _currentIndex == 0
-                          ? AppTheme.accentCyan
-                          : const Color(0xFFFFD700),
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
+              actions: [
+                // 👇 Botón de Noticias (arriba a la derecha)
+                /*
+                IconButton(
+                  icon: const Icon(Icons.newspaper, color: AppTheme.textSecond, size: 24),
+                  tooltip: 'Noticias Pokémon GO',
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const NewsScreen()),
+                    );
+                  },
                 ),
-              ),
-              backgroundColor:
-                  _currentIndex == 0
-                      ? AppTheme.accentCyan.withOpacity(0.1)
-                      : const Color(0xFFFFD700).withOpacity(0.1),
-              side: BorderSide(
-                color:
-                    _currentIndex == 0
-                        ? AppTheme.accentCyan.withOpacity(0.4)
-                        : const Color(0xFFFFD700).withOpacity(0.4),
-              ),
-              padding: EdgeInsets.zero,
-            ),
-          ),
-        ],
+                */
+                // 👇 Chip existente (se mantiene igual)
+                Padding(
+                  padding: const EdgeInsets.only(right: 12),
+                  child: Chip(
+                    label: Text(
+                      _currentIndex == 0 ? 'PoGoAPI' : 'TIER LIST',
+                      style: TextStyle(
+                        color:
+                            _currentIndex == 0
+                                ? AppTheme.accentCyan
+                                : const Color(0xFFFFD700),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    backgroundColor:
+                        _currentIndex == 0
+                            ? AppTheme.accentCyan.withOpacity(0.1)
+                            : const Color(0xFFFFD700).withOpacity(0.1),
+                    side: BorderSide(
+                      color:
+                          _currentIndex == 0
+                              ? AppTheme.accentCyan.withOpacity(0.4)
+                              : const Color(0xFFFFD700).withOpacity(0.4),
+                    ),
+                    padding: EdgeInsets.zero,
+                  ),
+                ),
+              ],
       ),
 
       body: IndexedStack(index: _currentIndex, children: _screens),

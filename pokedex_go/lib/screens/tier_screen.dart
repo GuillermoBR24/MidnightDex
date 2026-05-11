@@ -350,6 +350,7 @@ class _TierCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool _isLocalAsset(String url) => url.startsWith('megas/');
     final tierColor = _tierColors[entry.tier] ?? AppTheme.textSecond;
     final primary =
         entry.types.isNotEmpty
@@ -383,17 +384,17 @@ class _TierCard extends StatelessWidget {
           SizedBox(
             width: 52,
             height: 52,
-            child: entry.isMega
-                ? Image.asset(  // 👇 Para Megas: usa asset local
+            child: _isLocalAsset(entry.imageUrl)  // 👇 Verifica si es local
+                ? Image.asset(
                     entry.imageUrl,
                     fit: BoxFit.contain,
                     errorBuilder: (_, __, ___) => Icon(
-                      Icons.auto_awesome,  // ✨ Icono de Mega si falla
+                      Icons.auto_awesome,
                       color: primary.withOpacity(0.3),
                       size: 32,
                     ),
                   )
-                : CachedNetworkImage(  // 👇 Para normales: usa URL
+                : CachedNetworkImage(
                     imageUrl: entry.imageUrl,
                     fit: BoxFit.contain,
                     errorWidget: (_, __, ___) => Icon(

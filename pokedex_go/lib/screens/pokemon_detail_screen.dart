@@ -232,57 +232,154 @@ class _ReleasedViewState extends State<_ReleasedView> {
     int atk = widget.pokemon.baseAttack ?? 0;
     int def = widget.pokemon.baseDefense ?? 0;
     int sta = widget.pokemon.baseStamina ?? 0;
+    
+    final id = widget.pokemon.id;
 
-    if (_showMega) {
-      // Buff oficial de Mega Evolución en GO: +20% a stats base
+    if (id == 646 && !_showMega) {
+      // Kyurem Blanco/Negro tienen stats base diferentes
+      // Stats oficiales de Kyurem formas fusionadas:
+      return {
+        'atk': 246,  // Attack base de Kyurem Blanco/Negro
+        'def': 170,  // Defense base
+        'sta': 245,  // Stamina base
+      };
+    }
+    
+    // 👇 Kyurem formas: stats específicos (NO son buff +20%)
+    if (id == 646 && _showMega) {
+      // Kyurem Blanco/Negro tienen stats base diferentes
+      // Stats oficiales de Kyurem formas fusionadas:
+      return {
+        'atk': 310,  // Attack base de Kyurem Blanco/Negro
+        'def': 183,  // Defense base
+        'sta': 245,  // Stamina base
+      };
+    }
+
+    if (id == 483 && !_showMega) {
+      // Kyurem Blanco/Negro tienen stats base diferentes
+      // Stats oficiales de Kyurem formas fusionadas:
+      return {
+        'atk': 275,  // Attack base de Kyurem Blanco/Negro
+        'def': 211,  // Defense base
+        'sta': 205,  // Stamina base
+      };
+    }
+    
+    // 👇 Kyurem formas: stats específicos (NO son buff +20%)
+    if (id == 483 && _showMega) {
+      // Kyurem Blanco/Negro tienen stats base diferentes
+      // Stats oficiales de Kyurem formas fusionadas:
+      return {
+        'atk': 270,  // Attack base de Kyurem Blanco/Negro
+        'def': 225,  // Defense base
+        'sta': 205,  // Stamina base
+      };
+    }
+
+    if (id == 484 && !_showMega) {
+      // Kyurem Blanco/Negro tienen stats base diferentes
+      // Stats oficiales de Kyurem formas fusionadas:
+      return {
+        'atk': 280,  // Attack base de Kyurem Blanco/Negro
+        'def': 215,  // Defense base
+        'sta': 189,  // Stamina base
+      };
+    }
+    
+    // 👇 Kyurem formas: stats específicos (NO son buff +20%)
+    if (id == 484 && _showMega) {
+      // Kyurem Blanco/Negro tienen stats base diferentes
+      // Stats oficiales de Kyurem formas fusionadas:
+      return {
+        'atk': 286,  // Attack base de Kyurem Blanco/Negro
+        'def': 223,  // Defense base
+        'sta': 189,  // Stamina base
+      };
+    }
+
+    if (id == 487 && !_showMega) {
+      // Kyurem Blanco/Negro tienen stats base diferentes
+      // Stats oficiales de Kyurem formas fusionadas:
+      return {
+        'atk': 187,  // Attack base de Kyurem Blanco/Negro
+        'def': 225,  // Defense base
+        'sta': 284,  // Stamina base
+      };
+    }
+    
+    // 👇 Kyurem formas: stats específicos (NO son buff +20%)
+    if (id == 487 && _showMega) {
+      // Kyurem Blanco/Negro tienen stats base diferentes
+      // Stats oficiales de Kyurem formas fusionadas:
+      return {
+        'atk': 225,  // Attack base de Kyurem Blanco/Negro
+        'def': 187,  // Defense base
+        'sta': 284,  // Stamina base
+      };
+    }
+
+    if (id == 492 && !_showMega) {
+      // Kyurem Blanco/Negro tienen stats base diferentes
+      // Stats oficiales de Kyurem formas fusionadas:
+      return {
+        'atk': 210,  // Attack base de Kyurem Blanco/Negro
+        'def': 210,  // Defense base
+        'sta': 225,  // Stamina base
+      };
+    }
+    
+    // 👇 Kyurem formas: stats específicos (NO son buff +20%)
+    if (id == 492 && _showMega) {
+      // Kyurem Blanco/Negro tienen stats base diferentes
+      // Stats oficiales de Kyurem formas fusionadas:
+      return {
+        'atk': 261,  // Attack base de Kyurem Blanco/Negro
+        'def': 166,  // Defense base
+        'sta': 225,  // Stamina base
+      };
+    }
+    
+    // 👇 Mega Evoluciones: buff oficial +20% a stats base
+    if (_showMega && _isMegaAvailable) {
       atk = (atk * 1.2).round();
       def = (def * 1.2).round();
       sta = (sta * 1.2).round();
     }
+    
     return {'atk': atk, 'def': def, 'sta': sta};
   }
 
   /// Obtiene los tipos del Pokémon considerando Mega Evoluciones
   List<String> _getCurrentTypes() {
-    // Si no es Mega, devuelve los tipos normales
+    final id = widget.pokemon.id;
+    
+    // 👇 Kyurem formas: tipos específicos
+    if (id == 646 && _showMega) {
+      return _selectedMegaForm == 'X' 
+          ? ['Dragon', 'Fire']   // Kyurem Blanco
+          : ['Dragon', 'Ice'];   // Kyurem Negro
+    }
+    
+    // Si no es forma especial, devuelve tipos normales
     if (!_showMega || !_isMegaAvailable) {
       return widget.pokemon.types;
     }
     
-    final id = widget.pokemon.id;
-    
-    // 👇 Tipos especiales para Mega Evoluciones que cambian de tipo
+    // Tipos para otras Megas
     final megaTypes = <int, List<String>>{
-      // Charizard X: Fuego/Dragón
-      6: _selectedMegaForm == 'X' 
-          ? ['Fire', 'Dragon'] 
-          : ['Fire', 'Flying'],  // Charizard Y mantiene tipos
-      
-      // Gyarados Mega: Agua/Siniestro
+      6: _selectedMegaForm == 'X' ? ['Fire', 'Dragon'] : ['Fire', 'Flying'],
       130: ['Water', 'Dark'],
-      
-      // Sceptile Mega: Planta/Dragón
       254: ['Grass', 'Dragon'],
-      
-      // Altaria Mega: Dragón/Hada
       334: ['Dragon', 'Fairy'],
-      
-      // Mewtwo X: Psíquico/Lucha
-      150: _selectedMegaForm == 'X' 
-          ? ['Psychic', 'Fighting'] 
-          : ['Psychic'],  // Mewtwo Y mantiene tipo
-      
-      // Groudon Primal: Tierra/Fuego
+      150: _selectedMegaForm == 'X' ? ['Psychic', 'Fighting'] : ['Psychic'],
       383: ['Ground', 'Fire'],
-      
-      // Kyogre Primal: Agua (mantiene)
-      382: ['Water'],
     };
     
     return megaTypes[id] ?? widget.pokemon.types;
   }
   
-  static const Set<int> _dualMegaIds = {6, 150};
+  static const Set<int> _dualFormIds = {6, 150, 646};
 
   static const Set<int> _megaIds = {
     3,   // Venusaur
@@ -332,17 +429,32 @@ class _ReleasedViewState extends State<_ReleasedView> {
     445, // Garchomp
     448, // Lucario
     460, // Abomasnow
+    483, // Dialga
+    484, // Palkia
+    487, // Giratina
+    492, // Shaymin
     531, // Audino
+    646, // Kyurem
     719, // Diancie
     796, // Malamar
     71,  // Victreebel
   };
   
   bool get _isMegaAvailable => _megaIds.contains(widget.pokemon.id);
-  bool get _hasDualMega => _dualMegaIds.contains(widget.pokemon.id);
+  bool get _hasDualForm => _dualFormIds.contains(widget.pokemon.id);
 
-Widget _buildMegaToggleButton(String form) {
+  Widget _buildMegaToggleButton(String form) {
     final isSelected = _selectedMegaForm == form;
+    final id = widget.pokemon.id;
+    
+    // 👇 Texto especial para Kyurem
+    String buttonText;
+    if (id == 646) {
+      buttonText = form == 'X' ? '✨ BLANCO' : '✨ NEGRO';
+    } else {
+      buttonText = '✨ MEGA $form';
+    }
+    
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -374,7 +486,7 @@ Widget _buildMegaToggleButton(String form) {
               : null,
         ),
         child: Text(
-          '✨ MEGA $form',
+          buttonText,  // 👇 Usa el texto dinámico
           style: TextStyle(
             color: isSelected 
                 ? const Color(0xFF00E5FF)
@@ -439,18 +551,20 @@ Widget _buildMegaToggleButton(String form) {
     if (!_showMega || !_isMegaAvailable) return null;
     
     final id = widget.pokemon.id;
-    String path;
     
-    if (_hasDualMega) {
-      path = 'assets/megas/${id}_${_selectedMegaForm.toLowerCase()}.png';
-    } else {
-      path = 'assets/megas/$id.png';
+    // 👇 Kyurem formas: usa sufijo _white o _black
+    if (id == 646) {
+      final form = _selectedMegaForm == 'X' ? 'B' : 'N';
+      return 'megas/646_$form.png';
     }
     
-    // 👇 Debug: imprime la ruta en consola
-    debugPrint('🔍 Mega asset path: $path');
+    // Charizard/Mewtwo: usa _x o _y
+    if (_hasDualForm) {
+      return 'megas/${id}_${_selectedMegaForm.toLowerCase()}.png';
+    }
     
-    return path;
+    // Mega única
+    return 'megas/$id.png';
   }
 
   void _toggleShiny() {
@@ -478,15 +592,28 @@ Widget _buildMegaToggleButton(String form) {
   }
 
 String get _currentImageUrl {
-  if (_showMega && _isMegaAvailable) {
-    if (_hasDualMega) {
-      return 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/mega-${_selectedMegaForm.toLowerCase()}/${widget.pokemon.id}.png';
-    }
-    return 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/mega/${widget.pokemon.id}.png';
+  final id = widget.pokemon.id;
+  
+  // 👇 Kyurem formas: URLs de PokeAPI
+  if (id == 646 && _showMega) {
+    final form = _selectedMegaForm == 'X' ? 'white' : 'black';
+    return 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/646-$form.png';
   }
+  
+  // Mega Evoluciones (Charizard/Mewtwo)
+  if (_showMega && _isMegaAvailable) {
+    if (_hasDualForm && (id == 6 || id == 150)) {
+      return 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/mega-${_selectedMegaForm.toLowerCase()}/$id.png';
+    }
+    return 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/mega/$id.png';
+  }
+  
+  // Shiny
   if (_showShiny && widget.pokemon.possibleShiny == true) {
     return widget.pokemon.shinyImageUrl;
   }
+  
+  // Normal
   return widget.pokemon.imageUrl;
 }
 
@@ -499,6 +626,7 @@ String get _currentImageUrl {
     final cpm = Pokemon.getCpmForLevel(_selectedLevel);
     
     if (atk <= 0 || def <= 0 || sta <= 0) return 0;
+    
     final cp = (atk * sqrt(def.toDouble()) * sqrt(sta.toDouble()) * cpm * cpm) / 10;
     return cp.floor();
   }
@@ -622,7 +750,7 @@ String get _currentImageUrl {
                       ),
                     ),
                     // 👇 Selector X/Y más compacto (solo cuando Mega está activo)
-                    if (_showMega && _hasDualMega)
+                    if (_showMega && _hasDualForm)
                       const SizedBox.shrink(),
                   ],
                 ),
@@ -786,42 +914,29 @@ String get _currentImageUrl {
                         ],
                       ),
                     ),
-                    if (_showMega)
+                    if (_showMega || (widget.pokemon.id == 646 && _showMega))
                       Padding(
                         padding: const EdgeInsets.only(top: 8),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            // 👇 Botón toggle X/Y (solo para Charizard/Mewtwo)
-                            if (_hasDualMega) ...[
+                            if (_hasDualForm || widget.pokemon.id == 646) ...[
                               _buildMegaToggleButton('X'),
                               const SizedBox(width: 8),
-                              Container(
-                                width: 1,
-                                height: 24,
-                                color: AppTheme.borderColor,
-                              ),
+                              Container(width: 1, height: 24, color: AppTheme.borderColor),
                               const SizedBox(width: 8),
                               _buildMegaToggleButton('Y'),
                             ] else
-                              // Badge simple para Mega única
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                                 decoration: BoxDecoration(
                                   color: const Color(0xFF00E5FF).withOpacity(0.15),
                                   borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(
-                                    color: const Color(0xFF00E5FF),
-                                    width: 1.5,
-                                  ),
+                                  border: Border.all(color: const Color(0xFF00E5FF), width: 1.5),
                                 ),
                                 child: const Text(
                                   '✨ MEGA',
-                                  style: TextStyle(
-                                    color: Color(0xFF00E5FF),
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w800,
-                                  ),
+                                  style: TextStyle(color: Color(0xFF00E5FF), fontSize: 11, fontWeight: FontWeight.w800),
                                 ),
                               ),
                           ],

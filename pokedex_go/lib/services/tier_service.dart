@@ -117,7 +117,7 @@ class TierService {
       'Necrozma (Lunala)',
       'Chandelure Shadow Ghost',
       'Gengar Shadow Ghost',
-      'Mega Bannete',
+      'Mega Banette',
       'Mewtwo Shadow Ghost',
       'Blacephalon',
       'Gengar',
@@ -444,6 +444,34 @@ class TierService {
     );
     if (r.statusCode == 200) return json.decode(r.body);
     throw Exception('HTTP ${r.statusCode} en $ep');
+  }
+
+  static String? _getSpecialFormImageOverride(int id, String rawName) {
+    final nameLower = rawName.toLowerCase();
+    
+    // Kyurem Blanco/Negro (ID 646)
+    if (id == 646) {
+      if (nameLower.contains('black') || nameLower.contains('negro')) {
+        return 'megas/646_N.png';
+      }
+      if (nameLower.contains('white') || nameLower.contains('blanco')) {
+        return 'megas/646_B.png';
+      }
+    }
+    
+    // Shaymin Cielo (ID 492)
+    if (id == 492 && (nameLower.contains('cielo') || nameLower.contains('sky'))) {
+      return 'megas/492.png';
+    }
+    
+    // Dialga/Palkia/Giratina Origen (IDs 483, 484, 487)
+    if ((id == 483 || id == 484 || id == 487) && 
+        (nameLower.contains('origen') || nameLower.contains('origin'))) {
+      return 'megas/${id}.png';
+    }
+    
+    // Aquí puedes añadir más excepciones si es necesario
+    return null;
   }
 
   static int _toInt(dynamic v) {
@@ -846,7 +874,7 @@ class TierService {
             bestFastMove: fasts.isNotEmpty ? fasts.first : null,
             bestChargedMove: charged.isNotEmpty ? charged.first : null,
             formIndex: formIndex,
-            imageUrlOverride: isMega ? _resolveMegaArtworkUrl(megaData) : null,
+            imageUrlOverride: _getSpecialFormImageOverride(id, rawName),
           ),
         );
       }
@@ -964,4 +992,5 @@ class TierService {
     _megaCache = megaFinal;
     return (byTypeFinal, megaFinal);
   }
+  
 }

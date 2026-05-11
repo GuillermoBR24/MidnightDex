@@ -309,6 +309,7 @@ class _ReleasedViewState extends State<_ReleasedView> {
     257, // Blaziken
     260, // Swampert
     282, // Gardevoir
+    475, // Gallade
     302, // Sableye
     303, // Mawile
     306, // Aggron
@@ -392,7 +393,7 @@ Widget _buildMegaToggleButton(String form) {
     if (megaAssetPath != null) {
       return Image.asset(
         megaAssetPath,
-        height: 210,
+        height: 180,
         fit: BoxFit.contain,
         errorBuilder: (_, __, ___) => _buildPlaceholderImage(primary),
       ).animate().fadeIn(duration: 500.ms).scale(begin: const Offset(0.8, 0.8));

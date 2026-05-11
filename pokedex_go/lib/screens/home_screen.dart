@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:pokedex_go/screens/news_screen.dart';
+import 'package:pokedex_go/screens/raids_screen.dart';
 import '../theme/app_theme.dart';
 import 'pokedex_screen.dart';
 import 'tier_screen.dart';
@@ -15,7 +16,11 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
 
-  static const List<Widget> _screens = [PokedexScreen(), TierScreen()];
+  static const List<Widget> _screens = [
+    PokedexScreen(),
+    TierScreen(),
+    RaidsScreen(),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -131,6 +136,12 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: Icon(Icons.military_tech),
               label: 'Tier List',
             ),
+            /*
+            BottomNavigationBarItem(  // 👈 NUEVO
+              icon: Icon(Icons.castle),
+              label: 'Raids',
+            ),
+            */
           ],
         ),
       ),

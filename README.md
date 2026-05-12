@@ -29,7 +29,7 @@ Una aplicación Flutter para entusiastas de Pokémon GO que proporciona informac
 
 1. Clona el repositorio:
    ```bash
-   git clone https://github.com/tu-usuario/midnightdex.git
+   git clone https://github.com/GuillermoBR24/midnightdex.git
    cd midnightdex/pokedex_go
    ```
 

@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../models/pokemon.dart';
-import '../models/iv_config.dart';
 import '../theme/app_theme.dart';
 import '../widgets/type_badge.dart';
 import '../widgets/stat_bar.dart';
-import 'dart:math';
 
 class PokemonDetailScreen extends StatelessWidget {
   final Pokemon pokemon;
@@ -220,259 +218,71 @@ class _ReleasedView extends StatefulWidget {
 class _ReleasedViewState extends State<_ReleasedView> {
   bool _showShiny = false;
   bool _showMega = false;
-  String _selectedMegaForm = 'X';
+  int _selectedMegaIndex = 0;
   int _selectedLevel = 50;
-  
+
   // IVs por defecto (máximos)
   int _atkIv = 15;
   int _defIv = 15;
   int _staIv = 15;
 
+  bool get _isMegaAvailable => widget.pokemon.megaEvolutions.isNotEmpty;
+  bool get _hasMultipleMegas => widget.pokemon.megaEvolutions.length > 1;
+  MegaEvolution? get _currentMega =>
+      _isMegaAvailable ? widget.pokemon.megaEvolutions[_selectedMegaIndex] : null;
+
   Map<String, int> _getEffectiveStats() {
-    int atk = widget.pokemon.baseAttack ?? 0;
-    int def = widget.pokemon.baseDefense ?? 0;
-    int sta = widget.pokemon.baseStamina ?? 0;
-    
-    final id = widget.pokemon.id;
-
-    if (id == 646 && !_showMega) {
-      // Kyurem Blanco/Negro tienen stats base diferentes
-      // Stats oficiales de Kyurem formas fusionadas:
+    if (_showMega && _currentMega != null) {
       return {
-        'atk': 246,  // Attack base de Kyurem Blanco/Negro
-        'def': 170,  // Defense base
-        'sta': 245,  // Stamina base
+        'atk': _currentMega!.attack,
+        'def': _currentMega!.defense,
+        'sta': _currentMega!.stamina,
       };
     }
-    
-    // 👇 Kyurem formas: stats específicos (NO son buff +20%)
-    if (id == 646 && _showMega) {
-      // Kyurem Blanco/Negro tienen stats base diferentes
-      // Stats oficiales de Kyurem formas fusionadas:
-      return {
-        'atk': 310,  // Attack base de Kyurem Blanco/Negro
-        'def': 183,  // Defense base
-        'sta': 245,  // Stamina base
-      };
-    }
-
-    if (id == 483 && !_showMega) {
-      // Kyurem Blanco/Negro tienen stats base diferentes
-      // Stats oficiales de Kyurem formas fusionadas:
-      return {
-        'atk': 275,  // Attack base de Kyurem Blanco/Negro
-        'def': 211,  // Defense base
-        'sta': 205,  // Stamina base
-      };
-    }
-    
-    // 👇 Kyurem formas: stats específicos (NO son buff +20%)
-    if (id == 483 && _showMega) {
-      // Kyurem Blanco/Negro tienen stats base diferentes
-      // Stats oficiales de Kyurem formas fusionadas:
-      return {
-        'atk': 270,  // Attack base de Kyurem Blanco/Negro
-        'def': 225,  // Defense base
-        'sta': 205,  // Stamina base
-      };
-    }
-
-    if (id == 484 && !_showMega) {
-      // Kyurem Blanco/Negro tienen stats base diferentes
-      // Stats oficiales de Kyurem formas fusionadas:
-      return {
-        'atk': 280,  // Attack base de Kyurem Blanco/Negro
-        'def': 215,  // Defense base
-        'sta': 189,  // Stamina base
-      };
-    }
-    
-    // 👇 Kyurem formas: stats específicos (NO son buff +20%)
-    if (id == 484 && _showMega) {
-      // Kyurem Blanco/Negro tienen stats base diferentes
-      // Stats oficiales de Kyurem formas fusionadas:
-      return {
-        'atk': 286,  // Attack base de Kyurem Blanco/Negro
-        'def': 223,  // Defense base
-        'sta': 189,  // Stamina base
-      };
-    }
-
-    if (id == 487 && !_showMega) {
-      // Kyurem Blanco/Negro tienen stats base diferentes
-      // Stats oficiales de Kyurem formas fusionadas:
-      return {
-        'atk': 187,  // Attack base de Kyurem Blanco/Negro
-        'def': 225,  // Defense base
-        'sta': 284,  // Stamina base
-      };
-    }
-    
-    // 👇 Kyurem formas: stats específicos (NO son buff +20%)
-    if (id == 487 && _showMega) {
-      // Kyurem Blanco/Negro tienen stats base diferentes
-      // Stats oficiales de Kyurem formas fusionadas:
-      return {
-        'atk': 225,  // Attack base de Kyurem Blanco/Negro
-        'def': 187,  // Defense base
-        'sta': 284,  // Stamina base
-      };
-    }
-
-    if (id == 492 && !_showMega) {
-      // Kyurem Blanco/Negro tienen stats base diferentes
-      // Stats oficiales de Kyurem formas fusionadas:
-      return {
-        'atk': 210,  // Attack base de Kyurem Blanco/Negro
-        'def': 210,  // Defense base
-        'sta': 225,  // Stamina base
-      };
-    }
-    
-    // 👇 Kyurem formas: stats específicos (NO son buff +20%)
-    if (id == 492 && _showMega) {
-      // Kyurem Blanco/Negro tienen stats base diferentes
-      // Stats oficiales de Kyurem formas fusionadas:
-      return {
-        'atk': 261,  // Attack base de Kyurem Blanco/Negro
-        'def': 166,  // Defense base
-        'sta': 225,  // Stamina base
-      };
-    }
-    
-    // 👇 Mega Evoluciones: buff oficial +20% a stats base
-    if (_showMega && _isMegaAvailable) {
-      atk = (atk * 1.2).round();
-      def = (def * 1.2).round();
-      sta = (sta * 1.2).round();
-    }
-    
-    return {'atk': atk, 'def': def, 'sta': sta};
-  }
-
-  /// Obtiene los tipos del Pokémon considerando Mega Evoluciones
-  List<String> _getCurrentTypes() {
-    final id = widget.pokemon.id;
-    
-    // 👇 Kyurem formas: tipos específicos
-    if (id == 646 && _showMega) {
-      return _selectedMegaForm == 'X' 
-          ? ['Dragon', 'Fire']   // Kyurem Blanco
-          : ['Dragon', 'Ice'];   // Kyurem Negro
-    }
-    
-    // Si no es forma especial, devuelve tipos normales
-    if (!_showMega || !_isMegaAvailable) {
-      return widget.pokemon.types;
-    }
-    
-    // Tipos para otras Megas
-    final megaTypes = <int, List<String>>{
-      6: _selectedMegaForm == 'X' ? ['Fire', 'Dragon'] : ['Fire', 'Flying'],
-      130: ['Water', 'Dark'],
-      254: ['Grass', 'Dragon'],
-      334: ['Dragon', 'Fairy'],
-      150: _selectedMegaForm == 'X' ? ['Psychic', 'Fighting'] : ['Psychic'],
-      383: ['Ground', 'Fire'],
+    return {
+      'atk': widget.pokemon.baseAttack ?? 0,
+      'def': widget.pokemon.baseDefense ?? 0,
+      'sta': widget.pokemon.baseStamina ?? 0,
     };
-    
-    return megaTypes[id] ?? widget.pokemon.types;
   }
-  
-  static const Set<int> _dualFormIds = {6, 150, 646};
 
-  static const Set<int> _megaIds = {
-    3,   // Venusaur
-    6,   // Charizard
-    9,   // Blastoise
-    15,  // Beedrill
-    18,  // Pidgeot
-    65,  // Alakazam
-    80,  // Slowbro
-    94,  // Gengar
-    115, // Kangaskhan
-    127, // Pinsir
-    130, // Gyarados
-    142, // Aerodactyl
-    149, // Dragonite
-    150, // Mewtwo
-    181, // Ampharos
-    208, // Steelix
-    212, // Scizor
-    214, // Heracross
-    229, // Houndoom
-    248, // Tyranitar
-    254, // Sceptile
-    257, // Blaziken
-    260, // Swampert
-    282, // Gardevoir
-    475, // Gallade
-    302, // Sableye
-    303, // Mawile
-    306, // Aggron
-    308, // Medicham
-    310, // Manectric
-    319, // Sharpedo
-    323, // Camerupt
-    334, // Altaria
-    354, // Banette
-    359, // Absol
-    362, // Glalie
-    373, // Salamence
-    376, // Metagross
-    380, // Latias
-    381, // Latios
-    382, // Kyogre (Primigenio)
-    383, // Groudon (Primigenio)
-    384, // Rayquaza
-    428, // Lopunny
-    445, // Garchomp
-    448, // Lucario
-    460, // Abomasnow
-    483, // Dialga
-    484, // Palkia
-    487, // Giratina
-    492, // Shaymin
-    531, // Audino
-    646, // Kyurem
-    719, // Diancie
-    796, // Malamar
-    71,  // Victreebel
-  };
-  
-  bool get _isMegaAvailable => _megaIds.contains(widget.pokemon.id);
-  bool get _hasDualForm => _dualFormIds.contains(widget.pokemon.id);
-
-  Widget _buildMegaToggleButton(String form) {
-    final isSelected = _selectedMegaForm == form;
-    final id = widget.pokemon.id;
-    
-    // 👇 Texto especial para Kyurem
-    String buttonText;
-    if (id == 646) {
-      buttonText = form == 'X' ? '✨ BLANCO' : '✨ NEGRO';
-    } else {
-      buttonText = '✨ MEGA $form';
+  List<String> _getCurrentTypes() {
+    if (_showMega && _currentMega != null && _currentMega!.types.isNotEmpty) {
+      return _currentMega!.types;
     }
-    
+    return widget.pokemon.types;
+  }
+
+
+  int get _currentCp {
+    final s = _getEffectiveStats();
+    final atk = s['atk']! + _atkIv;
+    final def = s['def']! + _defIv;
+    final sta = s['sta']! + _staIv;
+    final cpm = Pokemon.getCpmForLevel(_selectedLevel);
+    return Pokemon.calcCp(atk, def, sta, cpm: cpm);
+  }
+
+  Widget _buildMegaToggleButton(int index) {
+    final mega = widget.pokemon.megaEvolutions[index];
+    final isSelected = _selectedMegaIndex == index;
+
     return GestureDetector(
       onTap: () {
         setState(() {
-          _selectedMegaForm = form;
+          _selectedMegaIndex = index;
         });
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         decoration: BoxDecoration(
-          color: isSelected 
+          color: isSelected
               ? const Color(0xFF00E5FF).withOpacity(0.25)
               : AppTheme.bgSurface,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: isSelected 
-                ? const Color(0xFF00E5FF)
-                : AppTheme.borderColor,
+            color: isSelected ? const Color(0xFF00E5FF) : AppTheme.borderColor,
             width: isSelected ? 1.5 : 1,
           ),
           boxShadow: isSelected
@@ -486,11 +296,9 @@ class _ReleasedViewState extends State<_ReleasedView> {
               : null,
         ),
         child: Text(
-          buttonText,  // 👇 Usa el texto dinámico
+          '✨ ${mega.label}',
           style: TextStyle(
-            color: isSelected 
-                ? const Color(0xFF00E5FF)
-                : AppTheme.textSecond,
+            color: isSelected ? const Color(0xFF00E5FF) : AppTheme.textSecond,
             fontSize: 11,
             fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
           ),
@@ -500,18 +308,17 @@ class _ReleasedViewState extends State<_ReleasedView> {
   }
 
   Widget _buildPokemonImage(Color primary) {
-    // 👇 Si es Mega, usa asset local
-    final megaAssetPath = _getMegaAssetPath();
-    if (megaAssetPath != null) {
-      return Image.asset(
-        megaAssetPath,
-        height: 180,
+    // 👇 Mega: imagen oficial servida por la Pokemon GO API
+    if (_showMega && _currentMega != null) {
+      return CachedNetworkImage(
+        imageUrl: _currentMega!.imageUrl,
+        height: 210,
         fit: BoxFit.contain,
-        errorBuilder: (_, __, ___) => _buildPlaceholderImage(primary),
+        errorWidget: (_, __, ___) => _buildPlaceholderImage(primary),
       ).animate().fadeIn(duration: 500.ms).scale(begin: const Offset(0.8, 0.8));
     }
-    
-    // 👇 Si es Shiny, usa URL de shiny
+
+    // 👇 Shiny
     if (_showShiny && widget.pokemon.possibleShiny == true) {
       return CachedNetworkImage(
         imageUrl: widget.pokemon.shinyImageUrl,
@@ -527,44 +334,14 @@ class _ReleasedViewState extends State<_ReleasedView> {
         },
       ).animate().fadeIn(duration: 500.ms).scale(begin: const Offset(0.8, 0.8));
     }
-    
-    // 👇 Por defecto, usa imagen normal
+
+    // 👇 Por defecto, imagen normal
     return CachedNetworkImage(
       imageUrl: widget.pokemon.imageUrl,
       height: 210,
       fit: BoxFit.contain,
       errorWidget: (_, __, ___) => _buildPlaceholderImage(primary),
     ).animate().fadeIn(duration: 500.ms).scale(begin: const Offset(0.8, 0.8));
-  }
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  String? _getMegaAssetPath() {
-    if (!_showMega || !_isMegaAvailable) return null;
-    
-    final id = widget.pokemon.id;
-    
-    // 👇 Kyurem formas: usa sufijo _white o _black
-    if (id == 646) {
-      final form = _selectedMegaForm == 'X' ? 'B' : 'N';
-      return 'megas/646_$form.png';
-    }
-    
-    // Charizard/Mewtwo: usa _x o _y
-    if (_hasDualForm) {
-      return 'megas/${id}_${_selectedMegaForm.toLowerCase()}.png';
-    }
-    
-    // Mega única
-    return 'megas/$id.png';
   }
 
   void _toggleShiny() {
@@ -583,113 +360,6 @@ class _ReleasedViewState extends State<_ReleasedView> {
         if (_showMega) _showShiny = false;
       });
     }
-  }
-
-  void _toggleMegaForm() {
-    setState(() {
-      _selectedMegaForm = _selectedMegaForm == 'X' ? 'Y' : 'X';
-    });
-  }
-
-String get _currentImageUrl {
-  final id = widget.pokemon.id;
-  
-  // 👇 Kyurem formas: URLs de PokeAPI
-  if (id == 646 && _showMega) {
-    final form = _selectedMegaForm == 'X' ? 'white' : 'black';
-    return 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/646-$form.png';
-  }
-  
-  // Mega Evoluciones (Charizard/Mewtwo)
-  if (_showMega && _isMegaAvailable) {
-    if (_hasDualForm && (id == 6 || id == 150)) {
-      return 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/mega-${_selectedMegaForm.toLowerCase()}/$id.png';
-    }
-    return 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/mega/$id.png';
-  }
-  
-  // Shiny
-  if (_showShiny && widget.pokemon.possibleShiny == true) {
-    return widget.pokemon.shinyImageUrl;
-  }
-  
-  // Normal
-  return widget.pokemon.imageUrl;
-}
-
-  int get _currentCp {
-    final s = _getEffectiveStats();
-    final atk = s['atk']! + _atkIv;
-    final def = s['def']! + _defIv;
-    final sta = s['sta']! + _staIv;
-    
-    final cpm = Pokemon.getCpmForLevel(_selectedLevel);
-    
-    if (atk <= 0 || def <= 0 || sta <= 0) return 0;
-    
-    final cp = (atk * sqrt(def.toDouble()) * sqrt(sta.toDouble()) * cpm * cpm) / 10;
-    return cp.floor();
-  }
-
-  // Widget compacto para selector X/Y en la AppBar (más pequeño)
-  Widget _buildCompactMegaFormButton(String form) {
-    final isSelected = _selectedMegaForm == form;
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selectedMegaForm = form;
-        });
-      },
-      child: Container(
-        width: 24,  // 👈 Más pequeño
-        height: 18,  // 👈 Más pequeño
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: isSelected 
-              ? const Color(0xFF00E5FF).withOpacity(0.2)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(3),  // 👈 Radio reducido
-        ),
-        child: Text(
-          form,
-          style: TextStyle(
-            color: isSelected 
-                ? const Color(0xFF00E5FF)
-                : AppTheme.textSecond,
-            fontSize: 9,  // 👈 Fuente más pequeña
-            fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMegaFormButton(String form) {
-    final isSelected = _selectedMegaForm == form;
-    return GestureDetector(
-      onTap: _toggleMegaForm,
-      child: Container(
-        width: 28,
-        height: 24,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: isSelected 
-              ? const Color(0xFF00E5FF).withOpacity(0.2)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(4),
-        ),
-        child: Text(
-          form,
-          style: TextStyle(
-            color: isSelected 
-                ? const Color(0xFF00E5FF)
-                : AppTheme.textSecond,
-            fontSize: 11,
-            fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-          ),
-        ),
-      ),
-    );
   }
 
   @override
@@ -713,74 +383,68 @@ String get _currentImageUrl {
               onPressed: () => Navigator.pop(context),
             ),
             actions: [
-            // 👇 Botón Mega Evolución
-            if (_isMegaAvailable)
-              Container(
-                margin: const EdgeInsets.only(right: 4),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Botón principal Mega
-                    AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 300),
-                      child: IconButton(
-                        key: ValueKey<bool>(_showMega),
-                        icon: ColorFiltered(
-                        colorFilter: ColorFilter.mode(
-                          _showMega 
-                              ? const Color(0xFF00E5FF)
-                              : AppTheme.textSecond, 
-                          BlendMode.srcIn,
-                        ),
-                        child: Image.asset(
-                          'assets/mega.png',
-                          width: 24,
-                          height: 24,
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                        tooltip: _showMega ? 'Ver normal' : 'Ver Mega',
-                        onPressed: _toggleMega,
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(
-                          minWidth: 40,
-                          minHeight: 40,
+              // 👇 Botón Mega Evolución
+              if (_isMegaAvailable)
+                Container(
+                  margin: const EdgeInsets.only(right: 4),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 300),
+                        child: IconButton(
+                          key: ValueKey<bool>(_showMega),
+                          icon: ColorFiltered(
+                            colorFilter: ColorFilter.mode(
+                              _showMega ? const Color(0xFF00E5FF) : AppTheme.textSecond,
+                              BlendMode.srcIn,
+                            ),
+                            child: Image.asset(
+                              'assets/mega.png',
+                              width: 24,
+                              height: 24,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                          tooltip: _showMega ? 'Ver normal' : 'Ver Mega',
+                          onPressed: _toggleMega,
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(
+                            minWidth: 40,
+                            minHeight: 40,
+                          ),
                         ),
                       ),
+                    ],
+                  ),
+                ),
+
+              // 👇 Botón Shiny
+              if (widget.pokemon.possibleShiny == true)
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  child: IconButton(
+                    key: ValueKey<bool>(_showShiny),
+                    icon: Icon(
+                      Icons.auto_awesome,
+                      color: _showShiny ? const Color(0xFFFFD700) : AppTheme.textSecond,
+                      size: 24,
+                      shadows: _showShiny
+                          ? [Shadow(color: const Color(0xFFFFD700).withOpacity(0.6), blurRadius: 10)]
+                          : [],
                     ),
-                    // 👇 Selector X/Y más compacto (solo cuando Mega está activo)
-                    if (_showMega && _hasDualForm)
-                      const SizedBox.shrink(),
-                  ],
-                ),
-              ),
-            
-            // 👇 Botón Shiny
-            if (widget.pokemon.possibleShiny == true)
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                child: IconButton(
-                  key: ValueKey<bool>(_showShiny),
-                  icon: Icon(
-                    Icons.auto_awesome,
-                    color: _showShiny ? const Color(0xFFFFD700) : AppTheme.textSecond,
-                    size: 24,  // 👈 Reducido de 26 a 24
-                    shadows: _showShiny
-                        ? [Shadow(color: const Color(0xFFFFD700).withOpacity(0.6), blurRadius: 10)]
-                        : [],
-                  ),
-                  tooltip: _showShiny ? 'Ver normal' : 'Ver shiny',
-                  onPressed: _toggleShiny,
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(
-                    minWidth: 40,
-                    minHeight: 40,
+                    tooltip: _showShiny ? 'Ver normal' : 'Ver shiny',
+                    onPressed: _toggleShiny,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(
+                      minWidth: 40,
+                      minHeight: 40,
+                    ),
                   ),
                 ),
-              ),
-            const SizedBox(width: 4),  // 👈 Reducido de 8 a 4
-          ],
+              const SizedBox(width: 4),
+            ],
             flexibleSpace: FlexibleSpaceBar(
               background: Stack(
                 alignment: Alignment.center,
@@ -862,8 +526,8 @@ String get _currentImageUrl {
                       Text(widget.pokemon.generation!, style: const TextStyle(color: AppTheme.textSecond, fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 0.5)),
                     const SizedBox(height: 12),
                     Wrap(
-                      spacing: 8, 
-                      children: _getCurrentTypes().map((t) => TypeBadge(type: t)).toList()
+                      spacing: 8,
+                      children: _getCurrentTypes().map((t) => TypeBadge(type: t)).toList(),
                     ),
                     const SizedBox(height: 16),
                     _BadgesRow(pokemon: widget.pokemon),
@@ -886,7 +550,6 @@ String get _currentImageUrl {
                     // ── Combat Power con IVs manuales ──
                     _SectionTitle(title: 'Combat Power'),
                     const SizedBox(height: 10),
-                    // CP Calculado
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                       decoration: BoxDecoration(
@@ -914,33 +577,37 @@ String get _currentImageUrl {
                         ],
                       ),
                     ),
-                    if (_showMega || (widget.pokemon.id == 646 && _showMega))
+                    if (_showMega && _isMegaAvailable)
                       Padding(
                         padding: const EdgeInsets.only(top: 8),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            if (_hasDualForm || widget.pokemon.id == 646) ...[
-                              _buildMegaToggleButton('X'),
-                              const SizedBox(width: 8),
-                              Container(width: 1, height: 24, color: AppTheme.borderColor),
-                              const SizedBox(width: 8),
-                              _buildMegaToggleButton('Y'),
-                            ] else
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF00E5FF).withOpacity(0.15),
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: const Color(0xFF00E5FF), width: 1.5),
-                                ),
-                                child: const Text(
-                                  '✨ MEGA',
-                                  style: TextStyle(color: Color(0xFF00E5FF), fontSize: 11, fontWeight: FontWeight.w800),
+                        child: _hasMultipleMegas
+                            ? Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  for (int i = 0; i < widget.pokemon.megaEvolutions.length; i++) ...[
+                                    if (i > 0) ...[
+                                      const SizedBox(width: 8),
+                                      Container(width: 1, height: 24, color: AppTheme.borderColor),
+                                      const SizedBox(width: 8),
+                                    ],
+                                    _buildMegaToggleButton(i),
+                                  ],
+                                ],
+                              )
+                            : Center(
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF00E5FF).withOpacity(0.15),
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(color: const Color(0xFF00E5FF), width: 1.5),
+                                  ),
+                                  child: Text(
+                                    '✨ ${_currentMega?.label ?? 'MEGA'}',
+                                    style: const TextStyle(color: Color(0xFF00E5FF), fontSize: 11, fontWeight: FontWeight.w800),
+                                  ),
                                 ),
                               ),
-                          ],
-                        ),
                       ),
                     const SizedBox(height: 20),
                     Container(
@@ -957,9 +624,9 @@ String get _currentImageUrl {
                           _StatIvSlider(label: 'ATK', value: _atkIv, color: const Color(0xFFFF6B35), onChanged: (v) => setState(() => _atkIv = v)),
                           _StatIvSlider(label: 'DEF', value: _defIv, color: const Color(0xFF2196F3), onChanged: (v) => setState(() => _defIv = v)),
                           _StatIvSlider(label: 'STA', value: _staIv, color: const Color(0xFF4CAF50), onChanged: (v) => setState(() => _staIv = v)),
-                          
+
                           const SizedBox(height: 8),
-                          
+
                           // Selector de Nivel
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -991,10 +658,10 @@ String get _currentImageUrl {
                           if (_showMega)
                             Row(
                               children: [
-                                Icon(Icons.bolt, color: const Color(0xFFFFD700), size: 14),
+                                const Icon(Icons.bolt, color: Color(0xFFFFD700), size: 14),
                                 const SizedBox(width: 4),
                                 Text(
-                                  'Mega: +20%',
+                                  _currentMega?.label ?? 'Mega',
                                   style: const TextStyle(
                                     color: Color(0xFFFFD700),
                                     fontSize: 10,
@@ -1006,7 +673,7 @@ String get _currentImageUrl {
                         ],
                       ),
                       const SizedBox(height: 10),
-                      
+
                       StatBar(
                         label: 'Ataque',
                         value: _getEffectiveStats()['atk']! + _atkIv,
@@ -1040,9 +707,6 @@ String get _currentImageUrl {
                           Expanded(child: _InfoTile(icon: Icons.fiber_manual_record, label: 'Candy evolución', value: '${widget.pokemon.candyToEvolve}', color: const Color(0xFFFF69B4))),
                       ],
                     ),
-                    const SizedBox(height: 12),
-                    if (widget.pokemon.raidLevel != null)
-                      _InfoTile(icon: Icons.shield, label: 'Nivel de Raid', value: 'Tier ${widget.pokemon.raidLevel}', color: const Color(0xFFFFD700), full: true),
                     const SizedBox(height: 20),
 
                     // ── Movimientos ──

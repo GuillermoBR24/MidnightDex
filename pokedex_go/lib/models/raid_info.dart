@@ -11,6 +11,7 @@ class RaidInfo {
   final RaidStats bossStats;
   final int trainersNeeded;
   final double difficulty;
+  final String? imageUrl;
 
   RaidInfo({
     required this.raidId,
@@ -25,6 +26,7 @@ class RaidInfo {
     required this.bossStats,
     required this.trainersNeeded,
     required this.difficulty,
+    this.imageUrl,
   });
 
   String get timeRemaining => _getTimeRemaining();

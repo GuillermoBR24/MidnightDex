@@ -57,7 +57,9 @@ class RaidDetailScreen extends StatelessWidget {
         children: [
           // Imagen grande
           CachedNetworkImage(
-            imageUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${raid.pokemonId}.png',
+            // DESPUÉS — usa la imagen real de la API (correcta también para Mega/Shadow raids)
+            imageUrl: raid.imageUrl ??
+                'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${raid.pokemonId}.png',
             height: 200,
             fit: BoxFit.contain,
           ),
@@ -179,6 +181,20 @@ class RaidDetailScreen extends StatelessWidget {
   }
 
   Widget _buildCountersSection() {
+    if (raid.topCounters.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppTheme.bgCard,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: const Text(
+          'Consulta las debilidades de arriba para elegir tus mejores atacantes.',
+          style: TextStyle(color: AppTheme.textSecond),
+          textAlign: TextAlign.center,
+        ),
+      );
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

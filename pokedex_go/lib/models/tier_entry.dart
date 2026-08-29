@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 
 class TierEntry {
   final int id;
@@ -43,19 +42,8 @@ class TierEntry {
 
   String get imageUrl {
     // 👇 Si el override es una ruta local (empieza con 'megas/'), usarlo primero
-    if (imageUrlOverride != null && imageUrlOverride!.startsWith('megas/')) {
-      return imageUrlOverride!;
-    }
-    
-    // Para Megas normales (lógica antigua)
-    if (isMega) {
-      final nameLower = name.toLowerCase();
-      String formSuffix = '';
-      if ((id == 6 || id == 150)) {
-        if (nameLower.contains(' x')) formSuffix = '_x';
-        else if (nameLower.contains(' y')) formSuffix = '_y';
-      }
-      return 'megas/$id$formSuffix.png';
+    if (imageUrlOverride != null && imageUrlOverride!.isNotEmpty) {
+      return imageUrlOverride!; // 👈 viene de la Pokemon GO API (incluye Megas)
     }
 
     // Fallback a URL web

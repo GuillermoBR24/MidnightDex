@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:dart_rss/domain/rss_feed.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../models/news.dart';
@@ -87,44 +86,6 @@ class NewsService {
       print('❌ Error parsing JSON: $e');
       return [];
     }
-  }
-
-  // ── Parser para RSS (respaldo) ──
-  static List<News> _parseRss(String body) {
-    try {
-      // Usar dart_rss si está disponible, sino parsing básico
-      // Aquí asumimos que tienes importado: import 'package:dart_rss/dart_rss.dart';
-      final rss = RssFeed.parse(body);
-      
-      return (rss.items ?? []).map((item) {
-        final title = (item.title as String?) ?? 'Sin título';
-        final description = (item.description as String?) ?? '';
-        final content = (item.content as String?) ?? '';
-        final link = (item.link as String?) ?? '';
-        final pubDate = (item.pubDate as DateTime?) ?? DateTime.now();
-        
-        final imageUrl = _extractImageUrl(content.isNotEmpty ? content : description);
-        
-        return News(
-          title: title,
-          description: _stripHtml(description),
-          imageUrl: imageUrl.isNotEmpty ? imageUrl : 'https://www.redditstatic.com/desktop2x/img/id-cards/home-banner.png',
-          link: link.replaceAll('.compact', ''),
-          publishedAt: pubDate,
-          category: 'Pokémon GO',
-        );
-      }).toList();
-    } catch (e) {
-      print('❌ Error parsing RSS: $e');
-      return [];
-    }
-  }
-
-  // Helpers
-  static String _extractImageUrl(String html) {
-    final imgRegex = RegExp(r'<img[^>]+src="([^"]+)"');
-    final match = imgRegex.firstMatch(html);
-    return match?.group(1)?.replaceAll('&amp;', '&') ?? '';
   }
 
   static String _stripHtml(String text) {

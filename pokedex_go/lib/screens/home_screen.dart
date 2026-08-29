@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:pokedex_go/screens/news_screen.dart';
 import 'package:pokedex_go/screens/raids_screen.dart';
 import '../theme/app_theme.dart';
 import 'pokedex_screen.dart';

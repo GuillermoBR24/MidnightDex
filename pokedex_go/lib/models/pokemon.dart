@@ -2,6 +2,28 @@
 import 'dart:math';
 import 'iv_config.dart';
 
+class MegaEvolution {
+  final String formId; // p.ej. TEMP_EVOLUTION_MEGA, TEMP_EVOLUTION_MEGA_X...
+  final String label; // "MEGA", "MEGA X", "MEGA Y", "PRIMIGENIO"
+  final int attack;
+  final int defense;
+  final int stamina;
+  final List<String> types;
+  final String imageUrl;
+  final String? shinyImageUrl;
+
+  const MegaEvolution({
+    required this.formId,
+    required this.label,
+    required this.attack,
+    required this.defense,
+    required this.stamina,
+    required this.types,
+    required this.imageUrl,
+    this.shinyImageUrl,
+  });
+}
+
 class Pokemon {
   final int id;
   final String name;
@@ -34,6 +56,11 @@ class Pokemon {
   final int? raidLevel;
   final bool? possibleShiny;
 
+  // 👇 NUEVO: datos que vienen directamente de la Pokemon GO API
+  final String? assetImageUrl;
+  final String? assetShinyImageUrl;
+  final List<MegaEvolution> megaEvolutions;
+
   Pokemon({
     required this.id,
     required this.name,
@@ -65,13 +92,22 @@ class Pokemon {
     this.generation,
     this.raidLevel,
     this.possibleShiny,
+    this.assetImageUrl,
+    this.assetShinyImageUrl,
+    this.megaEvolutions = const [],
   });
 
+  /// Imagen oficial: prioriza la que da la Pokemon GO API, si no hay,
+  /// cae en el sprite de PokéAPI (siempre existe por dex number).
   String get imageUrl =>
-      'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/$id.png';
+      (assetImageUrl != null && assetImageUrl!.isNotEmpty)
+          ? assetImageUrl!
+          : 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/$id.png';
 
   String get shinyImageUrl =>
-      'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/shiny/$id.png';
+      (assetShinyImageUrl != null && assetShinyImageUrl!.isNotEmpty)
+          ? assetShinyImageUrl!
+          : 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/shiny/$id.png';
 
   String get shinyImageUrlFallback =>
       'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/$id.png';
@@ -84,26 +120,24 @@ class Pokemon {
     return 'Standard';
   }
 
+  bool get hasMega => megaEvolutions.isNotEmpty;
+
   int calculateMaxCpWithIvs(IvConfig ivs, {int level = 50}) {
     if (baseAttack == null || baseDefense == null || baseStamina == null) {
       return maxCp ?? 0;
     }
-
     final cpm = getCpmForLevel(level);
     final attack = baseAttack! + ivs.attack;
     final defense = baseDefense! + ivs.defense;
     final stamina = baseStamina! + ivs.stamina;
+    return calcCp(attack, defense, stamina, cpm: cpm);
+  }
 
+  /// Cálculo estándar de CP reutilizable en toda la app (Pokédex, Tier List, Raids).
+  static int calcCp(int attack, int defense, int stamina, {double cpm = 0.79030001}) {
     if (attack <= 0 || defense <= 0 || stamina <= 0) return 0;
-
     final cp =
-        (attack *
-            sqrt(defense.toDouble()) *
-            sqrt(stamina.toDouble()) *
-            cpm *
-            cpm) /
-        10;
-
+        (attack * sqrt(defense.toDouble()) * sqrt(stamina.toDouble()) * cpm * cpm) / 10;
     final value = cp.floor();
     return value < 10 ? 10 : value;
   }

@@ -230,6 +230,7 @@ class _PokedexScreenState extends State<PokedexScreen> {
                           builder:
                               (_) => PokemonDetailScreen(
                                 pokemon: _filtered[index],
+                                allPokemon: _allPokemon,
                               ),
                         ),
                       ),

@@ -79,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding: const EdgeInsets.only(right: 12),
                   child: Chip(
                     label: Text(
-                      _currentIndex == 0 ? 'PoGoAPI' : 'TIER LIST',
+                      _currentIndex == 0 ? 'DEX' : 'TIER LIST',
                       style: TextStyle(
                         color:
                             _currentIndex == 0

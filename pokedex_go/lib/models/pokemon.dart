@@ -1,5 +1,7 @@
 // lib/models/pokemon.dart
 import 'dart:math';
+import 'package:pokedex_go/models/move_detail.dart';
+
 import 'iv_config.dart';
 
 class MegaEvolution {
@@ -47,14 +49,17 @@ class Pokemon {
   final int? candyToEvolve;
   final double? pokedexHeightM;
   final double? pokedexWeightKg;
-  final List<String> fastMoves;
-  final List<String> chargedMoves;
-  final List<String> eliteFastMoves;
-  final List<String> eliteChargedMoves;
+
+  final List<MoveDetail> fastMoves;
+  final List<MoveDetail> chargedMoves;
+  final List<MoveDetail> eliteFastMoves;
+  final List<MoveDetail> eliteChargedMoves;
+  
   final List<Map<String, dynamic>> evolutions;
   final String? generation;
   final int? raidLevel;
   final bool? possibleShiny;
+  final List<Map<String, dynamic>> alternateForms;
 
   // 👇 NUEVO: datos que vienen directamente de la Pokemon GO API
   final String? assetImageUrl;
@@ -95,7 +100,19 @@ class Pokemon {
     this.assetImageUrl,
     this.assetShinyImageUrl,
     this.megaEvolutions = const [],
+    this.alternateForms = const [],
   });
+
+  Map<String, dynamic>? getFormByName(String formName) {
+    final slug = formName.toLowerCase().trim();
+    for (final form in alternateForms) {
+      final formId = (form['id'] ?? '').toString().toLowerCase();
+      if (formId.contains(slug) || slug.contains(formId)) {
+        return form;
+      }
+    }
+    return null;
+  }
 
   /// Imagen oficial: prioriza la que da la Pokemon GO API, si no hay,
   /// cae en el sprite de PokéAPI (siempre existe por dex number).
@@ -118,6 +135,20 @@ class Pokemon {
     if (isMythic) return 'Mythic';
     if (isLegendary) return 'Legendary';
     return 'Standard';
+  }
+
+  String getImageForForm(String? formName) {
+    if (formName == null) return imageUrl;
+    
+    final form = getFormByName(formName);
+    if (form != null) {
+      final imgUrl = form['imageUrl'] as String?;
+      if (imgUrl != null && imgUrl.isNotEmpty) {
+        return imgUrl;
+      }
+    }
+    
+    return imageUrl;
   }
 
   bool get hasMega => megaEvolutions.isNotEmpty;
